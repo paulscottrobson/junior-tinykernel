@@ -51,5 +51,5 @@
 1D||Left Ctrl||||SDLK_LCTRL
 38||Left Alt||||SDLK_LALT
 39||Space||||SDLK_SPACE
-01||Esc||||SDLK_ESC
+01||Esc||||SDLK_ESCAPE
 56||\\||||SDLK_BACKSLASH

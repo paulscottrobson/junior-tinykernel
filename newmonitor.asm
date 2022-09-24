@@ -371,12 +371,6 @@ HandleKeyboard:
 		phx
 		phy
 
-;		pha
-;		jsr 	PrintHex
-;		lda 	#"."
-;		jsr 	PrintCharacter
-;		pla
-
 		pha 									; save new code
 		;
 		;		Set/clear bit in the KeyStatus area
@@ -582,7 +576,8 @@ _SRClear:
 	;
 	jsr 	INITKEYBOARD
 	cli
-	
+	jmp 	$8000
+
 NextChar:	
 	jsr 	NewReadKeyboard
 	jsr 	PrintHex
