@@ -116,9 +116,6 @@ for s in rawPS2data.strip().split("\n"):
 		if (keyCode ^ shiftKey) != 32:
 			fixupTable.append(keyCode)
 			fixupTable.append(shiftKey)
-	else:
-		if keyCode != 0:
-			keyCode |= 0x80
 
 	codes[scanCode] = { "char":m.group(2),"code":m.group(3),"keycode":keyCode }
 

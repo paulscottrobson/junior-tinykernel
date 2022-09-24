@@ -3,7 +3,7 @@
 ;
 ASCIIFromScanCode:
 	.byte	$00 ; $00 
-	.byte	$cc ; $01 Esc
+	.byte	$4c ; $01 Esc
 	.byte	$31 ; $02 1
 	.byte	$32 ; $03 2
 	.byte	$33 ; $04 3
@@ -16,8 +16,8 @@ ASCIIFromScanCode:
 	.byte	$30 ; $0b 0
 	.byte	$2d ; $0c -
 	.byte	$3d ; $0d =
-	.byte	$88 ; $0e Backspace
-	.byte	$89 ; $0f Tab
+	.byte	$08 ; $0e Backspace
+	.byte	$09 ; $0f Tab
 	.byte	$71 ; $10 q
 	.byte	$77 ; $11 w
 	.byte	$65 ; $12 e
@@ -30,7 +30,7 @@ ASCIIFromScanCode:
 	.byte	$70 ; $19 p
 	.byte	$5b ; $1a [
 	.byte	$5d ; $1b ]
-	.byte	$8d ; $1c Enter
+	.byte	$0d ; $1c Enter
 	.byte	$00 ; $1d Left Ctrl
 	.byte	$61 ; $1e a
 	.byte	$73 ; $1f s
@@ -59,7 +59,7 @@ ASCIIFromScanCode:
 	.byte	$00 ; $36 Right Shift
 	.byte	$00 ; $37 
 	.byte	$00 ; $38 Left Alt
-	.byte	$a0 ; $39 Space
+	.byte	$20 ; $39 Space
 	.byte	$00 ; $3a 
 	.byte	$00 ; $3b 
 	.byte	$00 ; $3c 
@@ -88,7 +88,7 @@ ASCIIFromScanCode:
 	.byte	$00 ; $53 
 	.byte	$00 ; $54 
 	.byte	$00 ; $55 
-	.byte	$dc ; $56 \
+	.byte	$5c ; $56 \
 	.byte	$00 ; $57 
 	.byte	$00 ; $58 
 	.byte	$00 ; $59 

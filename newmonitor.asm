@@ -19,11 +19,10 @@ XPosition = $203 							; X Character position
 YPosition = $204 							; Y Character position
 TextColour = $205 							; Text colour
 CurrentPage = $206 							; current I/O page
-LastPS2Code = $207 							; last PS2 code received
-KeyStatus = $208 							; status bits for keys, 18 x 8 bits = 144 bits.
-LastKey = $209 								; one element keyboard queue :)
+LastKey = $207 								; last key press
+KeyStatus = $208 							; status bits for keys, 16 x 8 bits = 128 bits.
 
-EndWorkSpace = $208+18
+EndWorkSpace = $208+16
 
 CWidth = 80 								; display size
 CHeight = 60
@@ -378,18 +377,18 @@ HandleKeyboard:
 ;		jsr 	PrintCharacter
 ;		pla
 
-		cmp 	#$90 							; non key PS/2 code
-		bcs 	_HKExit
 		pha 									; save new code
 		;
 		;		Set/clear bit in the KeyStatus area
 		;
-		pha
+		pha 									; 2nd save
+		pha 									; 3rd save
+		and 	#$7F
 		lsr 	a 								; divide by 8 -> X, offset in table
 		lsr 	a
 		lsr 	a
 		tax
-		pla
+		pla 									; restore 3rd save
 		and 	#7 								; count in Y
 		tay
 		lda 	#0
@@ -398,9 +397,8 @@ _HKGetBits:
 		rol 	a
 		dey
 		bpl 	_HKGetBits
-		ldy 	LastPS2Code 					; was last release ?
-		cpy 	#$F0  							; could EOR here, may miss PS/2 codes ?
-		beq 	_HKRelease
+		ply 									; restore 2nd save
+		bmi 	_HKRelease
 		ora 	KeyStatus,x  					; set bit
 		bra 	_HKWrite
 _HKRelease:
@@ -408,15 +406,16 @@ _HKRelease:
 		and 	KeyStatus,x
 _HKWrite:
 		sta 	KeyStatus,x
+		;
+		;		Process key if appropriate
+		;
 		pla 									; restore new code
-		cpy 	#$F0 							; was it a release
-		beq 	_HKExit
+		bmi 	_HKExit
 		jsr 	ConvertInsertKey
 _HKExit:				
 		ply
 		plx
 		pla
-		sta 	LastPS2Code
 		rts
 
 ; ********************************************************************************
@@ -431,11 +430,11 @@ ConvertInsertKey:
 		beq 	_CIKExit 					; key not known
 		tay 								; save in Y
 		bmi 	_CIKEndShiftCheck 			; if bit 7 was set shift doesn't affect this.
-		lda 	KeyStatus+2 				; check left shift
+		lda 	KeyStatus+5 				; check left shift
 		and 	#4
 		bne 	_CIKShift
-		lda 	KeyStatus+11 				; check right shift
-		and 	#2
+		lda 	KeyStatus+6 				; check right shift
+		and 	#$40
 		beq 	_CIKEndShiftCheck
 _CIKShift:
 		ldx 	#254 						; check shift table.
@@ -450,22 +449,23 @@ _CIKShiftNext:
 		ldy 	ShiftFixTable+1,x 			; get replacement
 		bra 	_CIKEndShiftCheck
 
-_CIDefaultShift:		
+_CIDefaultShift:							; don't shift control
+		cmp 	#32
+		bcc 	_CIKEndShiftCheck
 		tya 								; default shift.
 		eor 	#32
 		tay		
 _CIKEndShiftCheck: 							
-		lda 	KeyStatus+2 				; check LCtrl pressed
-		and 	#$10
+		lda 	KeyStatus+3 				; check LCtrl pressed
+		and 	#$20
 		beq 	_CIKNotControl
 		tya 								; lower 5 bits only on control.
 		and 	#31
 		tay 								
 _CIKNotControl:		
 		tya 	
-		and 	#$7F
-		sta 	LastKey 					; save key pressed without bit 7.
 _CIKExit:		
+		sta 	LastKey
 		rts
 
 ; ********************************************************************************
