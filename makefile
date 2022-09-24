@@ -8,7 +8,7 @@ endif
 all: monitor.rom
 
 monitor.rom : newmonitor.asm vicky.inc hardware.asm
-	make -C keyboard
+	make -B -C keyboard
 	64tass -c -b -o monitor.rom -L newmonitor.lst newmonitor.asm
 	python export.py
 

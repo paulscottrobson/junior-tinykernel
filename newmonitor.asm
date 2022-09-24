@@ -177,12 +177,50 @@ _SZ0NoAdd:
 
 ; ********************************************************************************
 ;                                        
+;                                	Print A in Hex
+;                                        
+; ********************************************************************************
+
+PrintHex:
+	pha
+	lda 	#32
+	jsr 	PrintCharacter
+	pla
+	pha
+	pha
+	lsr 	a
+	lsr 	a
+	lsr 	a
+	lsr 	a
+	jsr 	PrintNibble
+	pla
+	jsr 	PrintNibble
+	pla
+	rts
+PrintNibble:
+	and 	#15
+	cmp 	#10
+	bcc 	_PN0
+	adc 	#6
+_PN0:	
+	adc 	#48
+	jmp 	PrintCharacter
+
+; ********************************************************************************
+;                                        
 ;                                	Print Character
 ;                                        
 ; ********************************************************************************
 
 PrintCharacter:
+	pha
+	phx
+	phy
+
+	ldx 	1
+	phx
 	jsr 	SelectPage2
+
 	pha
 	cmp 	#8
 	beq 	_PCBackspace
@@ -208,9 +246,16 @@ PrintCharacter:
 	dec 	yPosition
 	jsr 	ScrollScreenUp
 _PCNotRight:
-	pla
 	jsr 	SelectPage0
 	jsr 	UpdateCursor
+	pla
+
+	plx 
+	stx 	1
+
+	ply
+	plx
+	pla
 	rts
 
 _PCTab:
@@ -326,6 +371,13 @@ HandleKeyboard:
 		pha
 		phx
 		phy
+
+;		pha
+;		jsr 	PrintHex
+;		lda 	#"."
+;		jsr 	PrintCharacter
+;		pla
+
 		cmp 	#$90 							; non key PS/2 code
 		bcs 	_HKExit
 		pha 									; save new code
@@ -530,11 +582,10 @@ _SRClear:
 	;
 	jsr 	INITKEYBOARD
 	cli
-;	jmp 	($00FE) 	
 	
 NextChar:	
 	jsr 	NewReadKeyboard
-	jsr 	PrintCharacter
+	jsr 	PrintHex
 	jsr 	PrintCharacter
 	jmp 	NextChar
 
