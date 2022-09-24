@@ -13,7 +13,7 @@ def export(sourceFile,targetFile):
 	h.write("static const BYTE8 {0}[] = {1} ;\n\n".format(arrayName,romImage))
 	h.close()
 
-export("monitor.rom","monitor_rom.h")
+export("monitor.rom","roms/monitor_rom.h")
 #export("foenix.bin","foenix_charset.h")
-export("Bm437_PhoenixEGA_8x8.bin","foenix_charset.h")
+export("Bm437_PhoenixEGA_8x8.bin","roms/foenix_charset.h")
 #export("basic.rom","basic_rom.h")
