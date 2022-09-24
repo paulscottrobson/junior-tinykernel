@@ -586,7 +586,6 @@ _SRClear:
 	ora 	#64
 	jsr 	$FFD2
 	jsr 	$FFD2
-	jsr 	$FFD2
 	;
 	jsr 	INITKEYBOARD
 	cli
