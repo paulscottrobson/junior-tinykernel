@@ -88,7 +88,7 @@ ASCIIFromScanCode:
 	.byte	$00 ; $53 
 	.byte	$00 ; $54 
 	.byte	$00 ; $55 
-	.byte	$5c ; $56 \
+	.byte	$00 ; $56 \\
 	.byte	$00 ; $57 
 	.byte	$00 ; $58 
 	.byte	$00 ; $59 

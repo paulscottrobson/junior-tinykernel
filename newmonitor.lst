@@ -1,7 +1,7 @@
 
 ; 64tass Turbo Assembler Macro V1.56.2625 listing file
 ; 64tass -c -b -o monitor.rom -L newmonitor.lst newmonitor.asm
-; Sat Sep 24 14:37:27 2022
+; Sat Sep 24 14:39:02 2022
 
 ;Offset	;Hex		;Monitor	;Source
 
@@ -903,7 +903,7 @@
 >f900	00					.byte	$00 ; $53
 >f901	00					.byte	$00 ; $54
 >f902	00					.byte	$00 ; $55
->f903	5c					.byte	$5c ; $56 \
+>f903	00					.byte	$00 ; $56 \\
 >f904	00					.byte	$00 ; $57
 >f905	00					.byte	$00 ; $58
 >f906	00					.byte	$00 ; $59
