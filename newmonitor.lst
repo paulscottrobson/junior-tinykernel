@@ -1,7 +1,7 @@
 
 ; 64tass Turbo Assembler Macro V1.56.2625 listing file
 ; 64tass -c -b -o monitor.rom -L newmonitor.lst newmonitor.asm
-; Sat Sep 24 15:56:11 2022
+; Sat Sep 24 16:58:17 2022
 
 ;Offset	;Hex		;Monitor	;Source
 
@@ -415,7 +415,7 @@
 .f1d2	60		rts				rts
 .f1d3					ConvertInsertKey:
 .f1d3	aa		tax				tax 								; scan code in X
-.f1d4	bd b0 f8	lda $f8b0,x			lda 	ASCIIFromScanCode,x 		; get ASCII unshifted
+.f1d4	bd c5 f8	lda $f8c5,x			lda 	ASCIIFromScanCode,x 		; get ASCII unshifted
 .f1d7	f0 39		beq $f212			beq 	_CIKExit 					; key not known
 .f1d9	a8		tay				tay 								; save in Y
 .f1da	30 2a		bmi $f206			bmi 	_CIKEndShiftCheck 			; if bit 7 was set shift doesn't affect this.
@@ -430,12 +430,12 @@
 .f1ec					_CIKShiftNext:
 .f1ec	e8		inx				inx
 .f1ed	e8		inx				inx
-.f1ee	3c 41 f9	bit $f941,x			bit  	ShiftFixTable,x 			; end of table ?
+.f1ee	3c 56 f9	bit $f956,x			bit  	ShiftFixTable,x 			; end of table ?
 .f1f1	30 0b		bmi $f1fe			bmi 	_CIDefaultShift
 .f1f3	98		tya				tya 								; found a match ?
-.f1f4	dd 41 f9	cmp $f941,x			cmp 	ShiftFixTable,x
+.f1f4	dd 56 f9	cmp $f956,x			cmp 	ShiftFixTable,x
 .f1f7	d0 f3		bne $f1ec			bne 	_CIKShiftNext
-.f1f9	bc 42 f9	ldy $f942,x			ldy 	ShiftFixTable+1,x 			; get replacement
+.f1f9	bc 57 f9	ldy $f957,x			ldy 	ShiftFixTable+1,x 			; get replacement
 .f1fc	80 08		bra $f206			bra 	_CIKEndShiftCheck
 .f1fe					_CIDefaultShift:
 .f1fe	c9 20		cmp #$20			cmp 	#32
@@ -475,145 +475,157 @@
 .f233					SystemReset:
 .f233	a2 ff		ldx #$ff		ldx		#$FF
 .f235	9a		txs			txs
-.f236	a2 18		ldx #$18		ldx 	#EndWorkSpace-StartWorkSpace
-.f238					_SRClear:
-.f238	9e ff 01	stz $01ff,x		stz 	StartWorkSpace-1,x
-.f23b	ca		dex			dex
-.f23c	e0 ff		cpx #$ff		cpx 	#$FF
-.f23e	d0 f8		bne $f238		bne 	_SRClear
-.f240	20 00 f0	jsr $f000		jsr 	SelectPage0
-.f243	a9 ff		lda #$ff	    LDA #$FF
-.f245	8d 68 d6	sta $d668	    STA INT_EDGE_REG0
-.f248	8d 69 d6	sta $d669	    STA INT_EDGE_REG1
-.f24b	8d 6c d6	sta $d66c	    STA INT_MASK_REG0
-.f24e	8d 6d d6	sta $d66d	    STA INT_MASK_REG1
-.f251	ad 60 d6	lda $d660	    lda INT_PENDING_REG0
-.f254	8d 60 d6	sta $d660	    sta INT_PENDING_REG0
-.f257	ad 61 d6	lda $d661	    lda INT_PENDING_REG1
-.f25a	8d 61 d6	sta $d661	    sta INT_PENDING_REG1
-.f25d	20 d0 f2	jsr $f2d0		jsr 	TinyVickyInitialise
-.f260	20 19 f3	jsr $f319		jsr 	Init_Text_LUT
-.f263	20 8f f4	jsr $f48f		jsr 	LoadGraphicsLUT
-.f266	20 25 f0	jsr $f025		jsr 	ClearScreen
-.f269	ee 04 02	inc $0204		inc 	yPosition
-.f26c	ee 04 02	inc $0204		inc 	yPosition
-.f26f	a9 c8		lda #$c8	    lda #200
-.f271	8d 19 d0	sta $d019	    sta VKY_LINE_CMP_VALUE_LO
-.f274	a9 00		lda #$00	    lda #0
-.f276	8d 1a d0	sta $d01a	    sta VKY_LINE_CMP_VALUE_HI
-.f279	a9 01		lda #$01	    lda #$01
-.f27b	8d 18 d0	sta $d018	    sta VKY_LINE_IRQ_CTRL_REG
-.f27e	78		sei		    SEI
-.f27f	ad 60 d6	lda $d660	    lda INT_PENDING_REG0  ; Read the Pending Register &
-.f282	29 02		and #$02	    and #JR0_INT01_SOL
-.f284	8d 60 d6	sta $d660	    sta INT_PENDING_REG0  ; Writing it back will clear the Active Bit
-.f287	ad 6c d6	lda $d66c	    lda INT_MASK_REG0
-.f28a	29 fd		and #$fd	    and #~JR0_INT01_SOL
-.f28c	8d 6c d6	sta $d66c	    sta INT_MASK_REG0
-.f28f	ad 60 d6	lda $d660	    lda INT_PENDING_REG0  ; Read the Pending Register &
-.f292	29 04		and #$04	    and #JR0_INT02_KBD
-.f294	8d 60 d6	sta $d660	    sta INT_PENDING_REG0  ; Writing it back will clear the Active Bit
-.f297	ad 6c d6	lda $d66c	    lda INT_MASK_REG0
-.f29a	29 fb		and #$fb	    and #~JR0_INT02_KBD
-.f29c	8d 6c d6	sta $d66c	    sta INT_MASK_REG0
-.f29f	20 00 f0	jsr $f000		jsr 	SelectPage0
-.f2a2	a9 01		lda #$01		lda 	#1
-.f2a4	8d 00 d1	sta $d100		sta 	$D100
-.f2a7	9c 01 d1	stz $d101		stz 	$D101
-.f2aa	9c 02 d1	stz $d102		stz 	$D102
-.f2ad	9c 03 d1	stz $d103		stz 	$D103
-.f2b0	ee 00 07	inc $0700		inc 	$700
-.f2b3	ad 00 07	lda $0700		lda 	$700
-.f2b6	29 0f		and #$0f		and 	#15
-.f2b8	09 40		ora #$40		ora 	#64
-.f2ba	20 d2 ff	jsr $ffd2		jsr 	$FFD2
-.f2bd	20 c8 f3	jsr $f3c8		jsr 	INITKEYBOARD
-.f2c0	58		cli			cli
-.f2c1	4c 00 80	jmp $8000		jmp 	$8000
-.f2c4					NextChar:
-.f2c4	20 16 f2	jsr $f216		jsr 	NewReadKeyboard
-.f2c7	20 a7 f0	jsr $f0a7		jsr 	PrintHex
-.f2ca	20 ca f0	jsr $f0ca		jsr 	PrintCharacter
-.f2cd	4c c4 f2	jmp $f2c4		jmp 	NextChar
+.f236	78		sei			sei
+.f237	a9 80		lda #$80		lda 	#$80
+.f239	85 00		sta $00			sta 	0
+.f23b	a2 07		ldx #$07		ldx 	#7
+.f23d					_SRInitLut:
+.f23d	8a		txa			txa
+.f23e	95 08		sta $08,x		sta 	8,x
+.f240	ca		dex			dex
+.f241	10 fa		bpl $f23d		bpl 	_SRInitLut
+.f243	64 00		stz $00			stz 	0
+.f245	a2 18		ldx #$18		ldx 	#EndWorkSpace-StartWorkSpace
+.f247					_SRClear:
+.f247	9e ff 01	stz $01ff,x		stz 	StartWorkSpace-1,x
+.f24a	ca		dex			dex
+.f24b	e0 ff		cpx #$ff		cpx 	#$FF
+.f24d	d0 f8		bne $f247		bne 	_SRClear
+.f24f	20 00 f0	jsr $f000		jsr 	SelectPage0
+.f252	a9 ff		lda #$ff	    LDA #$FF
+.f254	8d 68 d6	sta $d668	    STA INT_EDGE_REG0
+.f257	8d 69 d6	sta $d669	    STA INT_EDGE_REG1
+.f25a	8d 6c d6	sta $d66c	    STA INT_MASK_REG0
+.f25d	8d 6d d6	sta $d66d	    STA INT_MASK_REG1
+.f260	ad 60 d6	lda $d660	    lda INT_PENDING_REG0
+.f263	8d 60 d6	sta $d660	    sta INT_PENDING_REG0
+.f266	ad 61 d6	lda $d661	    lda INT_PENDING_REG1
+.f269	8d 61 d6	sta $d661	    sta INT_PENDING_REG1
+.f26c	20 e5 f2	jsr $f2e5		jsr 	TinyVickyInitialise
+.f26f	20 2e f3	jsr $f32e		jsr 	Init_Text_LUT
+.f272	20 a4 f4	jsr $f4a4		jsr 	LoadGraphicsLUT
+.f275	20 25 f0	jsr $f025		jsr 	ClearScreen
+.f278	ee 04 02	inc $0204		inc 	yPosition
+.f27b	ee 04 02	inc $0204		inc 	yPosition
+.f27e	a9 c8		lda #$c8	    lda #200
+.f280	8d 19 d0	sta $d019	    sta VKY_LINE_CMP_VALUE_LO
+.f283	a9 00		lda #$00	    lda #0
+.f285	8d 1a d0	sta $d01a	    sta VKY_LINE_CMP_VALUE_HI
+.f288	a9 01		lda #$01	    lda #$01
+.f28a	8d 18 d0	sta $d018	    sta VKY_LINE_IRQ_CTRL_REG
+.f28d	78		sei		    SEI
+.f28e	ad 60 d6	lda $d660	    lda INT_PENDING_REG0  ; Read the Pending Register &
+.f291	29 02		and #$02	    and #JR0_INT01_SOL
+.f293	8d 60 d6	sta $d660	    sta INT_PENDING_REG0  ; Writing it back will clear the Active Bit
+.f296	ad 6c d6	lda $d66c	    lda INT_MASK_REG0
+.f299	29 fd		and #$fd	    and #~JR0_INT01_SOL
+.f29b	8d 6c d6	sta $d66c	    sta INT_MASK_REG0
+.f29e	ad 60 d6	lda $d660	    lda INT_PENDING_REG0  ; Read the Pending Register &
+.f2a1	29 04		and #$04	    and #JR0_INT02_KBD
+.f2a3	8d 60 d6	sta $d660	    sta INT_PENDING_REG0  ; Writing it back will clear the Active Bit
+.f2a6	ad 6c d6	lda $d66c	    lda INT_MASK_REG0
+.f2a9	29 fb		and #$fb	    and #~JR0_INT02_KBD
+.f2ab	8d 6c d6	sta $d66c	    sta INT_MASK_REG0
+.f2ae	20 00 f0	jsr $f000		jsr 	SelectPage0
+.f2b1	a9 01		lda #$01		lda 	#1
+.f2b3	8d 00 d1	sta $d100		sta 	$D100
+.f2b6	9c 01 d1	stz $d101		stz 	$D101
+.f2b9	9c 02 d1	stz $d102		stz 	$D102
+.f2bc	9c 03 d1	stz $d103		stz 	$D103
+.f2bf	ee 00 07	inc $0700		inc 	$700
+.f2c2	ad 00 07	lda $0700		lda 	$700
+.f2c5	29 0f		and #$0f		and 	#15
+.f2c7	09 40		ora #$40		ora 	#64
+.f2c9	20 d2 ff	jsr $ffd2		jsr 	$FFD2
+.f2cc	20 d2 ff	jsr $ffd2		jsr 	$FFD2
+.f2cf	20 d2 ff	jsr $ffd2		jsr 	$FFD2
+.f2d2	20 dd f3	jsr $f3dd		jsr 	INITKEYBOARD
+.f2d5	58		cli			cli
+.f2d6	4c 00 80	jmp $8000		jmp 	$8000
+.f2d9					NextChar:
+.f2d9	20 16 f2	jsr $f216		jsr 	NewReadKeyboard
+.f2dc	20 a7 f0	jsr $f0a7		jsr 	PrintHex
+.f2df	20 ca f0	jsr $f0ca		jsr 	PrintCharacter
+.f2e2	4c d9 f2	jmp $f2d9		jmp 	NextChar
 
 ;******  Processing file: hardware.asm
 
-.f2d0					TinyVickyInitialise:
-.f2d0	a9 01		lda #$01	            lda # Mstr_Ctrl_Text_Mode_En        ; Text on, Overlay,Graphic,Bitmap,Tilemap,Sprite,Gamma,Disable off.
-.f2d2	8d 00 d0	sta $d000	            sta MASTER_CTRL_REG_L               ; Register $D000 in page 0
-.f2d5	ad 00 d0	lda $d000	            lda MASTER_CTRL_REG_L
-.f2d8	a9 01		lda #$01	            lda #Border_Ctrl_Enable             ; Enable border
-.f2da	8d 04 d0	sta $d004	            sta BORDER_CTRL_REG                 ; Register $D004 in page 0
-.f2dd	a9 80		lda #$80	            lda #$80                            ; set border colour to $804000
-.f2df	8d 05 d0	sta $d005	            sta BORDER_COLOR_B                  ; (registers $D005..$D007)
-.f2e2	a9 00		lda #$00	            lda #$00
-.f2e4	8d 06 d0	sta $d006	            sta BORDER_COLOR_G
-.f2e7	a9 00		lda #$00	            lda #$00
-.f2e9	8d 07 d0	sta $d007	            sta BORDER_COLOR_R
-.f2ec	a9 10		lda #$10	            lda #16                             ; border size (offset from top left ?)
-.f2ee	8d 08 d0	sta $d008	            sta BORDER_X_SIZE                   ; (registers $D008 .. $D009)
-.f2f1	8d 09 d0	sta $d009	            sta BORDER_Y_SIZE
-.f2f4	a9 05		lda #$05	            lda #Vky_Cursor_Enable | Vky_Cursor_Flash_Rate1
-.f2f6	8d 10 d0	sta $d010	            sta VKY_TXT_CURSOR_CTRL_REG         ; turn cursor on ($D010)
-.f2f9	a9 06		lda #$06	            lda #6
-.f2fb	8d 12 d0	sta $d012	            sta VKY_TXT_CURSOR_CHAR_REG         ; 160 is 128+32 so inverse space. ($D012)
-.f2fe	a9 1c		lda #$1c	            lda #28
-.f300	8d 13 d0	sta $d013	            sta VKY_TXT_CURSOR_COLR_REG         ; colour $2 $8 ($D013)
-.f303	a9 00		lda #$00	            lda #0                              ; cursor to (0,5)
-.f305	8d 14 d0	sta $d014	            sta VKY_TXT_CURSOR_X_REG_L          ; ($D014 .. $D017)
-.f308	8d 15 d0	sta $d015	            sta VKY_TXT_CURSOR_X_REG_H
-.f30b	8d 17 d0	sta $d017	            sta VKY_TXT_CURSOR_Y_REG_H
-.f30e	a9 05		lda #$05	            lda #5
-.f310	8d 16 d0	sta $d016	            sta VKY_TXT_CURSOR_Y_REG_L
-.f313	a9 ec		lda #$ec	            lda		#$EC 						; set text colour.
-.f315	8d 05 02	sta $0205	            sta 	TextColour
-.f318	60		rts		            rts
-.f319					Init_Text_LUT
-.f319	a2 00		ldx #$00	                LDX #$00
-.f31b	bd 34 f3	lda $f334,x	lutinitloop0    LDA fg_color_lut,x      ; get Local Data
-.f31e	9d 00 d8	sta $d800,x	                sta TEXT_LUT_FG,x   ; Write in LUT Memory ($D800)
-.f321	e8		inx		                inx
-.f322	e0 40		cpx #$40	                cpx #$40
-.f324	d0 f5		bne $f31b	                bne lutinitloop0
-.f326	a2 00		ldx #$00	                LDX #$00
-.f328	bd 74 f3	lda $f374,x	lutinitloop1    LDA bg_color_lut,x      ; get Local Data
-.f32b	9d 40 d8	sta $d840,x	                STA TEXT_LUT_BG,x   ; Write in LUT Memory ($D840)
-.f32e	e8		inx		                INX
-.f32f	e0 40		cpx #$40	                CPX #$40
-.f331	d0 f5		bne $f328	                bne lutinitloop1
-.f333	60		rts		                RTS
->f334	00 00 00 ff			fg_color_lut    .text $00, $00, $00, $FF
->f338	00 00 80 ff			                .text $00, $00, $80, $FF        ; blue
->f33c	00 80 00 ff			                .text $00, $80, $00, $FF        ; green
->f340	80 00 00 ff			                .text $80, $00, $00, $FF        ; red
->f344	00 80 80 ff			                .text $00, $80, $80, $FF        ; yellow (etc.)
->f348	80 80 00 ff			                .text $80, $80, $00, $FF
->f34c	80 00 80 ff			                .text $80, $00, $80, $FF
->f350	80 80 80 ff			                .text $80, $80, $80, $FF
->f354	00 45 ff ff			                .text $00, $45, $FF, $FF
->f358	13 45 8b ff			                .text $13, $45, $8B, $FF
->f35c	00 00 20 ff			                .text $00, $00, $20, $FF
->f360	00 20 00 ff			                .text $00, $20, $00, $FF
->f364	20 00 00 ff			                .text $20, $00, $00, $FF
->f368	20 20 20 ff			                .text $20, $20, $20, $FF
->f36c	ff 80 00 ff			                .text $FF, $80, $00, $FF
->f370	ff ff ff ff			                .text $FF, $FF, $FF, $FF
->f374	00 00 00 ff			bg_color_lut    .text $00, $00, $00, $FF  ;BGRA
->f378	aa 00 00 ff			                .text $AA, $00, $00, $FF
->f37c	00 80 00 ff			                .text $00, $80, $00, $FF
->f380	00 00 80 ff			                .text $00, $00, $80, $FF
->f384	00 20 20 ff			                .text $00, $20, $20, $FF
->f388	20 20 00 ff			                .text $20, $20, $00, $FF
->f38c	20 00 20 ff			                .text $20, $00, $20, $FF
->f390	20 20 20 ff			                .text $20, $20, $20, $FF
->f394	1e 69 d2 ff			                .text $1E, $69, $D2, $FF
->f398	13 45 8b ff			                .text $13, $45, $8B, $FF
->f39c	00 00 20 ff			                .text $00, $00, $20, $FF
->f3a0	00 20 00 ff			                .text $00, $20, $00, $FF
->f3a4	40 00 00 ff			                .text $40, $00, $00, $FF
->f3a8	10 10 10 ff			                .text $10, $10, $10, $FF
->f3ac	40 40 40 ff			                .text $40, $40, $40, $FF
->f3b0	ff ff ff ff			                .text $FF, $FF, $FF, $FF
+.f2e5					TinyVickyInitialise:
+.f2e5	a9 01		lda #$01	            lda # Mstr_Ctrl_Text_Mode_En        ; Text on, Overlay,Graphic,Bitmap,Tilemap,Sprite,Gamma,Disable off.
+.f2e7	8d 00 d0	sta $d000	            sta MASTER_CTRL_REG_L               ; Register $D000 in page 0
+.f2ea	ad 00 d0	lda $d000	            lda MASTER_CTRL_REG_L
+.f2ed	a9 01		lda #$01	            lda #Border_Ctrl_Enable             ; Enable border
+.f2ef	8d 04 d0	sta $d004	            sta BORDER_CTRL_REG                 ; Register $D004 in page 0
+.f2f2	a9 80		lda #$80	            lda #$80                            ; set border colour to $804000
+.f2f4	8d 05 d0	sta $d005	            sta BORDER_COLOR_B                  ; (registers $D005..$D007)
+.f2f7	a9 00		lda #$00	            lda #$00
+.f2f9	8d 06 d0	sta $d006	            sta BORDER_COLOR_G
+.f2fc	a9 00		lda #$00	            lda #$00
+.f2fe	8d 07 d0	sta $d007	            sta BORDER_COLOR_R
+.f301	a9 10		lda #$10	            lda #16                             ; border size (offset from top left ?)
+.f303	8d 08 d0	sta $d008	            sta BORDER_X_SIZE                   ; (registers $D008 .. $D009)
+.f306	8d 09 d0	sta $d009	            sta BORDER_Y_SIZE
+.f309	a9 05		lda #$05	            lda #Vky_Cursor_Enable | Vky_Cursor_Flash_Rate1
+.f30b	8d 10 d0	sta $d010	            sta VKY_TXT_CURSOR_CTRL_REG         ; turn cursor on ($D010)
+.f30e	a9 06		lda #$06	            lda #6
+.f310	8d 12 d0	sta $d012	            sta VKY_TXT_CURSOR_CHAR_REG         ; 160 is 128+32 so inverse space. ($D012)
+.f313	a9 1c		lda #$1c	            lda #28
+.f315	8d 13 d0	sta $d013	            sta VKY_TXT_CURSOR_COLR_REG         ; colour $2 $8 ($D013)
+.f318	a9 00		lda #$00	            lda #0                              ; cursor to (0,5)
+.f31a	8d 14 d0	sta $d014	            sta VKY_TXT_CURSOR_X_REG_L          ; ($D014 .. $D017)
+.f31d	8d 15 d0	sta $d015	            sta VKY_TXT_CURSOR_X_REG_H
+.f320	8d 17 d0	sta $d017	            sta VKY_TXT_CURSOR_Y_REG_H
+.f323	a9 05		lda #$05	            lda #5
+.f325	8d 16 d0	sta $d016	            sta VKY_TXT_CURSOR_Y_REG_L
+.f328	a9 ec		lda #$ec	            lda		#$EC 						; set text colour.
+.f32a	8d 05 02	sta $0205	            sta 	TextColour
+.f32d	60		rts		            rts
+.f32e					Init_Text_LUT
+.f32e	a2 00		ldx #$00	                LDX #$00
+.f330	bd 49 f3	lda $f349,x	lutinitloop0    LDA fg_color_lut,x      ; get Local Data
+.f333	9d 00 d8	sta $d800,x	                sta TEXT_LUT_FG,x   ; Write in LUT Memory ($D800)
+.f336	e8		inx		                inx
+.f337	e0 40		cpx #$40	                cpx #$40
+.f339	d0 f5		bne $f330	                bne lutinitloop0
+.f33b	a2 00		ldx #$00	                LDX #$00
+.f33d	bd 89 f3	lda $f389,x	lutinitloop1    LDA bg_color_lut,x      ; get Local Data
+.f340	9d 40 d8	sta $d840,x	                STA TEXT_LUT_BG,x   ; Write in LUT Memory ($D840)
+.f343	e8		inx		                INX
+.f344	e0 40		cpx #$40	                CPX #$40
+.f346	d0 f5		bne $f33d	                bne lutinitloop1
+.f348	60		rts		                RTS
+>f349	00 00 00 ff			fg_color_lut    .text $00, $00, $00, $FF
+>f34d	00 00 80 ff			                .text $00, $00, $80, $FF        ; blue
+>f351	00 80 00 ff			                .text $00, $80, $00, $FF        ; green
+>f355	80 00 00 ff			                .text $80, $00, $00, $FF        ; red
+>f359	00 80 80 ff			                .text $00, $80, $80, $FF        ; yellow (etc.)
+>f35d	80 80 00 ff			                .text $80, $80, $00, $FF
+>f361	80 00 80 ff			                .text $80, $00, $80, $FF
+>f365	80 80 80 ff			                .text $80, $80, $80, $FF
+>f369	00 45 ff ff			                .text $00, $45, $FF, $FF
+>f36d	13 45 8b ff			                .text $13, $45, $8B, $FF
+>f371	00 00 20 ff			                .text $00, $00, $20, $FF
+>f375	00 20 00 ff			                .text $00, $20, $00, $FF
+>f379	20 00 00 ff			                .text $20, $00, $00, $FF
+>f37d	20 20 20 ff			                .text $20, $20, $20, $FF
+>f381	ff 80 00 ff			                .text $FF, $80, $00, $FF
+>f385	ff ff ff ff			                .text $FF, $FF, $FF, $FF
+>f389	00 00 00 ff			bg_color_lut    .text $00, $00, $00, $FF  ;BGRA
+>f38d	aa 00 00 ff			                .text $AA, $00, $00, $FF
+>f391	00 80 00 ff			                .text $00, $80, $00, $FF
+>f395	00 00 80 ff			                .text $00, $00, $80, $FF
+>f399	00 20 20 ff			                .text $00, $20, $20, $FF
+>f39d	20 20 00 ff			                .text $20, $20, $00, $FF
+>f3a1	20 00 20 ff			                .text $20, $00, $20, $FF
+>f3a5	20 20 20 ff			                .text $20, $20, $20, $FF
+>f3a9	1e 69 d2 ff			                .text $1E, $69, $D2, $FF
+>f3ad	13 45 8b ff			                .text $13, $45, $8B, $FF
+>f3b1	00 00 20 ff			                .text $00, $00, $20, $FF
+>f3b5	00 20 00 ff			                .text $00, $20, $00, $FF
+>f3b9	40 00 00 ff			                .text $40, $00, $00, $FF
+>f3bd	10 10 10 ff			                .text $10, $10, $10, $FF
+>f3c1	40 40 40 ff			                .text $40, $40, $40, $FF
+>f3c5	ff ff ff ff			                .text $FF, $FF, $FF, $FF
 =$d644					STATUS_PORT     = $D644;
 =$d644					KBD_CMD_BUF     = $D644;
 =$d640					KBD_OUT_BUF     = $D640;
@@ -630,375 +642,375 @@
 =$10					INH_KEYBOARD    = $10
 =$ae					KBD_ENA         = $AE
 =$ad					KBD_DIS         = $AD
-.f3b4	ad 44 d6	lda $d644	Poll_Inbuf      lda STATUS_PORT     ; Load Status Byte
-.f3b7	29 02		and #$02	                and #INPT_BUF_FULL  ; Test bit $02 (if 0, Empty)
-.f3b9	c9 02		cmp #$02	                cmp #INPT_BUF_FULL
-.f3bb	f0 f7		beq $f3b4	                beq Poll_Inbuf
-.f3bd	60		rts		                rts
-.f3be	ad 44 d6	lda $d644	Poll_Outbuf     lda STATUS_PORT
-.f3c1	29 01		and #$01	                and #OUT_BUF_FULL ; Test bit $01 (if 1, Full)
-.f3c3	c9 01		cmp #$01	                cmp #OUT_BUF_FULL
-.f3c5	d0 f7		bne $f3be	                bne Poll_Outbuf
-.f3c7	60		rts		                rts
-.f3c8	18		clc		INITKEYBOARD    clc
-.f3c9	a9 aa		lda #$aa	                lda #$AA                    ; Send self test command
-.f3cb	8d 44 d6	sta $d644	                sta KBD_CMD_BUF
-.f3ce	20 be f3	jsr $f3be	                jsr Poll_Outbuf             ; Sent Self-Test Code and Waiting for Return value, it ought to be 0x55.
-.f3d1	ad 40 d6	lda $d640	                lda KBD_OUT_BUF             ; Check self test result
-.f3d4	c9 55		cmp #$55	                cmp #$55
-.f3d6	f0 03		beq $f3db	                beq passAAtest
-.f3d8	4c 66 f4	jmp $f466	                jmp initkb_loop_out
-.f3db	20 15 f0	jsr $f015	passAAtest      jsr SelectPage2              ; put chr$(31) "1" on top left of screen
-.f3de	a9 31		lda #$31	                lda #$31
-.f3e0	8d 00 c0	sta $c000	                sta $C000
-.f3e3	20 00 f0	jsr $f000	                jsr SelectPage0
-.f3e6	20 b4 f3	jsr $f3b4	                jsr Poll_Inbuf
-.f3e9	a9 ab		lda #$ab	                lda #$AB                     ;Send test Interface command
-.f3eb	8d 44 d6	sta $d644	                sta KBD_CMD_BUF
-.f3ee	20 be f3	jsr $f3be	                jsr Poll_Outbuf ;
-.f3f1					TryAgainAB:
-.f3f1	ad 40 d6	lda $d640	                lda KBD_OUT_BUF               ;Display Interface test results
-.f3f4	c9 00		cmp #$00	                cmp #$00                      ;Should be 00
-.f3f6	f0 10		beq $f408	                beq passABtest
-.f3f8	d0 f7		bne $f3f1	                bne TryAgainAB
-.f3fa	20 15 f0	jsr $f015	                jsr SelectPage2                 ; not reachable
-.f3fd	a9 23		lda #$23	                lda #$23
-.f3ff	8d 05 c0	sta $c005	                sta $C005
-.f402	20 00 f0	jsr $f000	                jsr SelectPage0
-.f405	4c 66 f4	jmp $f466	                jmp initkb_loop_out
-.f408	20 15 f0	jsr $f015	passABtest      jsr SelectPage2                  ; put "2" on top left, 2nd character
-.f40b	a9 32		lda #$32	                lda #$32
-.f40d	8d 01 c0	sta $c001	                sta $C001
-.f410	20 00 f0	jsr $f000	                jsr SelectPage0
-.f413	a9 60		lda #$60	                lda #$60                        ; Send Command 0x60 so to Enable Interrupt
-.f415	8d 44 d6	sta $d644	                sta KBD_CMD_BUF
-.f418	20 b4 f3	jsr $f3b4	                jsr Poll_Inbuf
-.f41b	a9 41		lda #$41	                lda #%01000001                  ; Enable Interrupt (keyboard) and parallel port (?)
-.f41d	8d 40 d6	sta $d640	                sta KBD_DATA_BUF
-.f420	20 15 f0	jsr $f015	                jsr SelectPage2                  ; put "3" on 3rd character
-.f423	a9 33		lda #$33	                lda #$33
-.f425	8d 02 c0	sta $c002	                sta $C002
-.f428	20 00 f0	jsr $f000	                jsr SelectPage0
-.f42b	20 b4 f3	jsr $f3b4	                jsr Poll_Inbuf;
-.f42e	a9 ff		lda #$ff	                lda #$FF      ; Send Keyboard Reset command
-.f430	8d 40 d6	sta $d640	                sta KBD_DATA_BUF
-.f433	a0 ff		ldy #$ff	                 ldy #$FF
-.f435	a2 ff		ldx #$ff	DLY_LOOP2       ldx #$FF
-.f437	ca		dex		DLY_LOOP1       dex
-.f438	ea		nop		                nop
-.f439	ea		nop		                nop
-.f43a	ea		nop		                nop
-.f43b	ea		nop		                nop
-.f43c	e0 00		cpx #$00	                cpx #$00
-.f43e	d0 f7		bne $f437	                bne DLY_LOOP1
-.f440	88		dey		                dey
-.f441	c0 00		cpy #$00	                cpy #$00
-.f443	d0 f0		bne $f435	                bne DLY_LOOP2
-.f445	ea		nop		                nop
-.f446	20 be f3	jsr $f3be	                jsr Poll_Outbuf ;
-.f449	ad 40 d6	lda $d640	                lda KBD_OUT_BUF                 ; Read Output Buffer
-.f44c	20 15 f0	jsr $f015	                jsr SelectPage2                     ;
-.f44f	a9 34		lda #$34	                lda #$34                        ; put "4" in fourth slot.
-.f451	8d 03 c0	sta $c003	                sta $C003
-.f454	20 00 f0	jsr $f000	                jsr SelectPage0
-.f457					DO_CMD_F4_AGAIN
-.f457	20 b4 f3	jsr $f3b4	                jsr Poll_Inbuf ;
-.f45a	a9 f4		lda #$f4	                lda #$F4                        ; Enable the Keyboard
-.f45c	8d 40 d6	sta $d640	                sta KBD_DATA_BUF
-.f45f	20 be f3	jsr $f3be	                jsr Poll_Outbuf ;
-.f462	ad 40 d6	lda $d640	                lda KBD_OUT_BUF                  ; Clear the Output buffer
-.f465	60		rts		                rts
-.f466					initkb_loop_out
-.f466	60		rts		                rts
-.f467					IRQHandler
-.f467	48		pha		                pha
-.f468	a5 01		lda $01		                lda     1
-.f46a	48		pha		                pha
-.f46b	29 f8		and #$f8	                and     #$F8
-.f46d	85 01		sta $01		                sta     1
-.f46f	ad 60 d6	lda $d660	                LDA INT_PENDING_REG0                ; received Keyboard interrupt ?
-.f472	29 04		and #$04	                AND #JR0_INT02_KBD
-.f474	c9 04		cmp #$04	                CMP #JR0_INT02_KBD
-.f476	d0 06		bne $f47e	                BNE EXIT_IRQ_HANDLE
-.f478	ad 40 d6	lda $d640	                LDA KBD_INPT_BUF                    ; Get Scan Code from KeyBoard
-.f47b	20 a2 f1	jsr $f1a2	                jsr     HandleKeyboard
-.f47e					EXIT_IRQ_HANDLE:
-.f47e	ad 60 d6	lda $d660	                lda INT_PENDING_REG0
-.f481	8d 60 d6	sta $d660	                sta INT_PENDING_REG0
-.f484	ad 61 d6	lda $d661	                lda INT_PENDING_REG1
-.f487	8d 61 d6	sta $d661	                sta INT_PENDING_REG1
-.f48a	68		pla		                pla
-.f48b	85 01		sta $01		                sta     1
-.f48d	68		pla		                pla
-.f48e	40		rti		                rti
-.f48f					LoadGraphicsLUT:
-.f48f	20 0c f0	jsr $f00c	            jsr     SelectPage1
-.f492	a2 00		ldx #$00	            ldx     #0
-.f494	bd b0 f4	lda $f4b0,x	_LGLLoop:   lda     _GraphicsLUT,x
-.f497	9d 00 d0	sta $d000,x	            sta     TyVKY_LUT0,x
-.f49a	bd b0 f5	lda $f5b0,x	            lda     _GraphicsLUT+256,x
-.f49d	9d 00 d1	sta $d100,x	            sta     TyVKY_LUT0+256,x
-.f4a0	bd b0 f6	lda $f6b0,x	            lda     _GraphicsLUT+512,x
-.f4a3	9d 00 d2	sta $d200,x	            sta     TyVKY_LUT0+512,x
-.f4a6	bd b0 f7	lda $f7b0,x	            lda     _GraphicsLUT+768,x
-.f4a9	9d 00 d3	sta $d300,x	            sta     TyVKY_LUT0+768,x
-.f4ac	ca		dex		            dex
-.f4ad	d0 e5		bne $f494	            bne     _LGLLoop
-.f4af	60		rts		            rts
-.f4b0					_GraphicsLUT:
->f4b0	00 00 00 00 aa 00 00 00		            .binary    "gfxlut.palette"
->f4b8	00 aa 00 00 aa aa 00 00 00 00 aa 00 aa 00 aa 00
->f4c8	00 55 aa 00 aa aa aa 00 55 55 55 00 ff 55 55 00
->f4d8	55 ff 55 00 ff ff 55 00 55 55 ff 00 ff 55 ff 00
->f4e8	55 ff ff 00 ff ff ff 00 00 00 00 00 10 10 10 00
->f4f8	20 20 20 00 35 35 35 00 45 45 45 00 55 55 55 00
->f508	65 65 65 00 75 75 75 00 8a 8a 8a 00 9a 9a 9a 00
->f518	aa aa aa 00 ba ba ba 00 ca ca ca 00 df df df 00
->f528	ef ef ef 00 ff ff ff 00 ff 00 00 00 ff 00 41 00
->f538	ff 00 82 00 ff 00 be 00 ff 00 ff 00 be 00 ff 00
->f548	82 00 ff 00 41 00 ff 00 00 00 ff 00 00 41 ff 00
->f558	00 82 ff 00 00 be ff 00 00 ff ff 00 00 ff be 00
->f568	00 ff 82 00 00 ff 41 00 00 ff 00 00 41 ff 00 00
->f578	82 ff 00 00 be ff 00 00 ff ff 00 00 ff be 00 00
->f588	ff 82 00 00 ff 41 00 00 ff 82 82 00 ff 82 9e 00
->f598	ff 82 be 00 ff 82 df 00 ff 82 ff 00 df 82 ff 00
->f5a8	be 82 ff 00 9e 82 ff 00 82 82 ff 00 82 9e ff 00
->f5b8	82 be ff 00 82 df ff 00 82 ff ff 00 82 ff df 00
->f5c8	82 ff be 00 82 ff 9e 00 82 ff 82 00 9e ff 82 00
->f5d8	be ff 82 00 df ff 82 00 ff ff 82 00 ff df 82 00
->f5e8	ff be 82 00 ff 9e 82 00 ff ba ba 00 ff ba ca 00
->f5f8	ff ba df 00 ff ba ef 00 ff ba ff 00 ef ba ff 00
->f608	df ba ff 00 ca ba ff 00 ba ba ff 00 ba ca ff 00
->f618	ba df ff 00 ba ef ff 00 ba ff ff 00 ba ff ef 00
->f628	ba ff df 00 ba ff ca 00 ba ff ba 00 ca ff ba 00
->f638	df ff ba 00 ef ff ba 00 ff ff ba 00 ff ef ba 00
->f648	ff df ba 00 ff ca ba 00 71 00 00 00 71 00 1c 00
->f658	71 00 39 00 71 00 55 00 71 00 71 00 55 00 71 00
->f668	39 00 71 00 1c 00 71 00 00 00 71 00 00 1c 71 00
->f678	00 39 71 00 00 55 71 00 00 71 71 00 00 71 55 00
->f688	00 71 39 00 00 71 1c 00 00 71 00 00 1c 71 00 00
->f698	39 71 00 00 55 71 00 00 71 71 00 00 71 55 00 00
->f6a8	71 39 00 00 71 1c 00 00 71 39 39 00 71 39 45 00
->f6b8	71 39 55 00 71 39 61 00 71 39 71 00 61 39 71 00
->f6c8	55 39 71 00 45 39 71 00 39 39 71 00 39 45 71 00
->f6d8	39 55 71 00 39 61 71 00 39 71 71 00 39 71 61 00
->f6e8	39 71 55 00 39 71 45 00 39 71 39 00 45 71 39 00
->f6f8	55 71 39 00 61 71 39 00 71 71 39 00 71 61 39 00
->f708	71 55 39 00 71 45 39 00 71 51 51 00 71 51 59 00
->f718	71 51 61 00 71 51 69 00 71 51 71 00 69 51 71 00
->f728	61 51 71 00 59 51 71 00 51 51 71 00 51 59 71 00
->f738	51 61 71 00 51 69 71 00 51 71 71 00 51 71 69 00
->f748	51 71 61 00 51 71 59 00 51 71 51 00 59 71 51 00
->f758	61 71 51 00 69 71 51 00 71 71 51 00 71 69 51 00
->f768	71 61 51 00 71 59 51 00 41 00 00 00 41 00 10 00
->f778	41 00 20 00 41 00 31 00 41 00 41 00 31 00 41 00
->f788	20 00 41 00 10 00 41 00 00 00 41 00 00 10 41 00
->f798	00 20 41 00 00 31 41 00 00 41 41 00 00 41 31 00
->f7a8	00 41 20 00 00 41 10 00 00 41 00 00 10 41 00 00
->f7b8	20 41 00 00 31 41 00 00 41 41 00 00 41 31 00 00
->f7c8	41 20 00 00 41 10 00 00 41 20 20 00 41 20 28 00
->f7d8	41 20 31 00 41 20 39 00 41 20 41 00 39 20 41 00
->f7e8	31 20 41 00 28 20 41 00 20 20 41 00 20 28 41 00
->f7f8	20 31 41 00 20 39 41 00 20 41 41 00 20 41 39 00
->f808	20 41 31 00 20 41 28 00 20 41 20 00 28 41 20 00
->f818	31 41 20 00 39 41 20 00 41 41 20 00 41 39 20 00
->f828	41 31 20 00 41 28 20 00 41 2d 2d 00 41 2d 31 00
->f838	41 2d 35 00 41 2d 3d 00 41 2d 41 00 3d 2d 41 00
->f848	35 2d 41 00 31 2d 41 00 2d 2d 41 00 2d 31 41 00
->f858	2d 35 41 00 2d 3d 41 00 2d 41 41 00 2d 41 3d 00
->f868	2d 41 35 00 2d 41 31 00 2d 41 2d 00 31 41 2d 00
->f878	35 41 2d 00 3d 41 2d 00 41 41 2d 00 41 3d 2d 00
->f888	41 35 2d 00 41 31 2d 00 00 00 00 00 00 00 00 00
->f898	00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->f8a8	00 00 00 00 00 00 00 00
+.f3c9	ad 44 d6	lda $d644	Poll_Inbuf      lda STATUS_PORT     ; Load Status Byte
+.f3cc	29 02		and #$02	                and #INPT_BUF_FULL  ; Test bit $02 (if 0, Empty)
+.f3ce	c9 02		cmp #$02	                cmp #INPT_BUF_FULL
+.f3d0	f0 f7		beq $f3c9	                beq Poll_Inbuf
+.f3d2	60		rts		                rts
+.f3d3	ad 44 d6	lda $d644	Poll_Outbuf     lda STATUS_PORT
+.f3d6	29 01		and #$01	                and #OUT_BUF_FULL ; Test bit $01 (if 1, Full)
+.f3d8	c9 01		cmp #$01	                cmp #OUT_BUF_FULL
+.f3da	d0 f7		bne $f3d3	                bne Poll_Outbuf
+.f3dc	60		rts		                rts
+.f3dd	18		clc		INITKEYBOARD    clc
+.f3de	a9 aa		lda #$aa	                lda #$AA                    ; Send self test command
+.f3e0	8d 44 d6	sta $d644	                sta KBD_CMD_BUF
+.f3e3	20 d3 f3	jsr $f3d3	                jsr Poll_Outbuf             ; Sent Self-Test Code and Waiting for Return value, it ought to be 0x55.
+.f3e6	ad 40 d6	lda $d640	                lda KBD_OUT_BUF             ; Check self test result
+.f3e9	c9 55		cmp #$55	                cmp #$55
+.f3eb	f0 03		beq $f3f0	                beq passAAtest
+.f3ed	4c 7b f4	jmp $f47b	                jmp initkb_loop_out
+.f3f0	20 15 f0	jsr $f015	passAAtest      jsr SelectPage2              ; put chr$(31) "1" on top left of screen
+.f3f3	a9 31		lda #$31	                lda #$31
+.f3f5	8d 00 c0	sta $c000	                sta $C000
+.f3f8	20 00 f0	jsr $f000	                jsr SelectPage0
+.f3fb	20 c9 f3	jsr $f3c9	                jsr Poll_Inbuf
+.f3fe	a9 ab		lda #$ab	                lda #$AB                     ;Send test Interface command
+.f400	8d 44 d6	sta $d644	                sta KBD_CMD_BUF
+.f403	20 d3 f3	jsr $f3d3	                jsr Poll_Outbuf ;
+.f406					TryAgainAB:
+.f406	ad 40 d6	lda $d640	                lda KBD_OUT_BUF               ;Display Interface test results
+.f409	c9 00		cmp #$00	                cmp #$00                      ;Should be 00
+.f40b	f0 10		beq $f41d	                beq passABtest
+.f40d	d0 f7		bne $f406	                bne TryAgainAB
+.f40f	20 15 f0	jsr $f015	                jsr SelectPage2                 ; not reachable
+.f412	a9 23		lda #$23	                lda #$23
+.f414	8d 05 c0	sta $c005	                sta $C005
+.f417	20 00 f0	jsr $f000	                jsr SelectPage0
+.f41a	4c 7b f4	jmp $f47b	                jmp initkb_loop_out
+.f41d	20 15 f0	jsr $f015	passABtest      jsr SelectPage2                  ; put "2" on top left, 2nd character
+.f420	a9 32		lda #$32	                lda #$32
+.f422	8d 01 c0	sta $c001	                sta $C001
+.f425	20 00 f0	jsr $f000	                jsr SelectPage0
+.f428	a9 60		lda #$60	                lda #$60                        ; Send Command 0x60 so to Enable Interrupt
+.f42a	8d 44 d6	sta $d644	                sta KBD_CMD_BUF
+.f42d	20 c9 f3	jsr $f3c9	                jsr Poll_Inbuf
+.f430	a9 41		lda #$41	                lda #%01000001                  ; Enable Interrupt (keyboard) and parallel port (?)
+.f432	8d 40 d6	sta $d640	                sta KBD_DATA_BUF
+.f435	20 15 f0	jsr $f015	                jsr SelectPage2                  ; put "3" on 3rd character
+.f438	a9 33		lda #$33	                lda #$33
+.f43a	8d 02 c0	sta $c002	                sta $C002
+.f43d	20 00 f0	jsr $f000	                jsr SelectPage0
+.f440	20 c9 f3	jsr $f3c9	                jsr Poll_Inbuf;
+.f443	a9 ff		lda #$ff	                lda #$FF      ; Send Keyboard Reset command
+.f445	8d 40 d6	sta $d640	                sta KBD_DATA_BUF
+.f448	a0 ff		ldy #$ff	                 ldy #$FF
+.f44a	a2 ff		ldx #$ff	DLY_LOOP2       ldx #$FF
+.f44c	ca		dex		DLY_LOOP1       dex
+.f44d	ea		nop		                nop
+.f44e	ea		nop		                nop
+.f44f	ea		nop		                nop
+.f450	ea		nop		                nop
+.f451	e0 00		cpx #$00	                cpx #$00
+.f453	d0 f7		bne $f44c	                bne DLY_LOOP1
+.f455	88		dey		                dey
+.f456	c0 00		cpy #$00	                cpy #$00
+.f458	d0 f0		bne $f44a	                bne DLY_LOOP2
+.f45a	ea		nop		                nop
+.f45b	20 d3 f3	jsr $f3d3	                jsr Poll_Outbuf ;
+.f45e	ad 40 d6	lda $d640	                lda KBD_OUT_BUF                 ; Read Output Buffer
+.f461	20 15 f0	jsr $f015	                jsr SelectPage2                     ;
+.f464	a9 34		lda #$34	                lda #$34                        ; put "4" in fourth slot.
+.f466	8d 03 c0	sta $c003	                sta $C003
+.f469	20 00 f0	jsr $f000	                jsr SelectPage0
+.f46c					DO_CMD_F4_AGAIN
+.f46c	20 c9 f3	jsr $f3c9	                jsr Poll_Inbuf ;
+.f46f	a9 f4		lda #$f4	                lda #$F4                        ; Enable the Keyboard
+.f471	8d 40 d6	sta $d640	                sta KBD_DATA_BUF
+.f474	20 d3 f3	jsr $f3d3	                jsr Poll_Outbuf ;
+.f477	ad 40 d6	lda $d640	                lda KBD_OUT_BUF                  ; Clear the Output buffer
+.f47a	60		rts		                rts
+.f47b					initkb_loop_out
+.f47b	60		rts		                rts
+.f47c					IRQHandler
+.f47c	48		pha		                pha
+.f47d	a5 01		lda $01		                lda     1
+.f47f	48		pha		                pha
+.f480	29 f8		and #$f8	                and     #$F8
+.f482	85 01		sta $01		                sta     1
+.f484	ad 60 d6	lda $d660	                LDA INT_PENDING_REG0                ; received Keyboard interrupt ?
+.f487	29 04		and #$04	                AND #JR0_INT02_KBD
+.f489	c9 04		cmp #$04	                CMP #JR0_INT02_KBD
+.f48b	d0 06		bne $f493	                BNE EXIT_IRQ_HANDLE
+.f48d	ad 40 d6	lda $d640	                LDA KBD_INPT_BUF                    ; Get Scan Code from KeyBoard
+.f490	20 a2 f1	jsr $f1a2	                jsr     HandleKeyboard
+.f493					EXIT_IRQ_HANDLE:
+.f493	ad 60 d6	lda $d660	                lda INT_PENDING_REG0
+.f496	8d 60 d6	sta $d660	                sta INT_PENDING_REG0
+.f499	ad 61 d6	lda $d661	                lda INT_PENDING_REG1
+.f49c	8d 61 d6	sta $d661	                sta INT_PENDING_REG1
+.f49f	68		pla		                pla
+.f4a0	85 01		sta $01		                sta     1
+.f4a2	68		pla		                pla
+.f4a3	40		rti		                rti
+.f4a4					LoadGraphicsLUT:
+.f4a4	20 0c f0	jsr $f00c	            jsr     SelectPage1
+.f4a7	a2 00		ldx #$00	            ldx     #0
+.f4a9	bd c5 f4	lda $f4c5,x	_LGLLoop:   lda     _GraphicsLUT,x
+.f4ac	9d 00 d0	sta $d000,x	            sta     TyVKY_LUT0,x
+.f4af	bd c5 f5	lda $f5c5,x	            lda     _GraphicsLUT+256,x
+.f4b2	9d 00 d1	sta $d100,x	            sta     TyVKY_LUT0+256,x
+.f4b5	bd c5 f6	lda $f6c5,x	            lda     _GraphicsLUT+512,x
+.f4b8	9d 00 d2	sta $d200,x	            sta     TyVKY_LUT0+512,x
+.f4bb	bd c5 f7	lda $f7c5,x	            lda     _GraphicsLUT+768,x
+.f4be	9d 00 d3	sta $d300,x	            sta     TyVKY_LUT0+768,x
+.f4c1	ca		dex		            dex
+.f4c2	d0 e5		bne $f4a9	            bne     _LGLLoop
+.f4c4	60		rts		            rts
+.f4c5					_GraphicsLUT:
+>f4c5	00 00 00 00 aa 00 00 00		            .binary    "gfxlut.palette"
+>f4cd	00 aa 00 00 aa aa 00 00 00 00 aa 00 aa 00 aa 00
+>f4dd	00 55 aa 00 aa aa aa 00 55 55 55 00 ff 55 55 00
+>f4ed	55 ff 55 00 ff ff 55 00 55 55 ff 00 ff 55 ff 00
+>f4fd	55 ff ff 00 ff ff ff 00 00 00 00 00 10 10 10 00
+>f50d	20 20 20 00 35 35 35 00 45 45 45 00 55 55 55 00
+>f51d	65 65 65 00 75 75 75 00 8a 8a 8a 00 9a 9a 9a 00
+>f52d	aa aa aa 00 ba ba ba 00 ca ca ca 00 df df df 00
+>f53d	ef ef ef 00 ff ff ff 00 ff 00 00 00 ff 00 41 00
+>f54d	ff 00 82 00 ff 00 be 00 ff 00 ff 00 be 00 ff 00
+>f55d	82 00 ff 00 41 00 ff 00 00 00 ff 00 00 41 ff 00
+>f56d	00 82 ff 00 00 be ff 00 00 ff ff 00 00 ff be 00
+>f57d	00 ff 82 00 00 ff 41 00 00 ff 00 00 41 ff 00 00
+>f58d	82 ff 00 00 be ff 00 00 ff ff 00 00 ff be 00 00
+>f59d	ff 82 00 00 ff 41 00 00 ff 82 82 00 ff 82 9e 00
+>f5ad	ff 82 be 00 ff 82 df 00 ff 82 ff 00 df 82 ff 00
+>f5bd	be 82 ff 00 9e 82 ff 00 82 82 ff 00 82 9e ff 00
+>f5cd	82 be ff 00 82 df ff 00 82 ff ff 00 82 ff df 00
+>f5dd	82 ff be 00 82 ff 9e 00 82 ff 82 00 9e ff 82 00
+>f5ed	be ff 82 00 df ff 82 00 ff ff 82 00 ff df 82 00
+>f5fd	ff be 82 00 ff 9e 82 00 ff ba ba 00 ff ba ca 00
+>f60d	ff ba df 00 ff ba ef 00 ff ba ff 00 ef ba ff 00
+>f61d	df ba ff 00 ca ba ff 00 ba ba ff 00 ba ca ff 00
+>f62d	ba df ff 00 ba ef ff 00 ba ff ff 00 ba ff ef 00
+>f63d	ba ff df 00 ba ff ca 00 ba ff ba 00 ca ff ba 00
+>f64d	df ff ba 00 ef ff ba 00 ff ff ba 00 ff ef ba 00
+>f65d	ff df ba 00 ff ca ba 00 71 00 00 00 71 00 1c 00
+>f66d	71 00 39 00 71 00 55 00 71 00 71 00 55 00 71 00
+>f67d	39 00 71 00 1c 00 71 00 00 00 71 00 00 1c 71 00
+>f68d	00 39 71 00 00 55 71 00 00 71 71 00 00 71 55 00
+>f69d	00 71 39 00 00 71 1c 00 00 71 00 00 1c 71 00 00
+>f6ad	39 71 00 00 55 71 00 00 71 71 00 00 71 55 00 00
+>f6bd	71 39 00 00 71 1c 00 00 71 39 39 00 71 39 45 00
+>f6cd	71 39 55 00 71 39 61 00 71 39 71 00 61 39 71 00
+>f6dd	55 39 71 00 45 39 71 00 39 39 71 00 39 45 71 00
+>f6ed	39 55 71 00 39 61 71 00 39 71 71 00 39 71 61 00
+>f6fd	39 71 55 00 39 71 45 00 39 71 39 00 45 71 39 00
+>f70d	55 71 39 00 61 71 39 00 71 71 39 00 71 61 39 00
+>f71d	71 55 39 00 71 45 39 00 71 51 51 00 71 51 59 00
+>f72d	71 51 61 00 71 51 69 00 71 51 71 00 69 51 71 00
+>f73d	61 51 71 00 59 51 71 00 51 51 71 00 51 59 71 00
+>f74d	51 61 71 00 51 69 71 00 51 71 71 00 51 71 69 00
+>f75d	51 71 61 00 51 71 59 00 51 71 51 00 59 71 51 00
+>f76d	61 71 51 00 69 71 51 00 71 71 51 00 71 69 51 00
+>f77d	71 61 51 00 71 59 51 00 41 00 00 00 41 00 10 00
+>f78d	41 00 20 00 41 00 31 00 41 00 41 00 31 00 41 00
+>f79d	20 00 41 00 10 00 41 00 00 00 41 00 00 10 41 00
+>f7ad	00 20 41 00 00 31 41 00 00 41 41 00 00 41 31 00
+>f7bd	00 41 20 00 00 41 10 00 00 41 00 00 10 41 00 00
+>f7cd	20 41 00 00 31 41 00 00 41 41 00 00 41 31 00 00
+>f7dd	41 20 00 00 41 10 00 00 41 20 20 00 41 20 28 00
+>f7ed	41 20 31 00 41 20 39 00 41 20 41 00 39 20 41 00
+>f7fd	31 20 41 00 28 20 41 00 20 20 41 00 20 28 41 00
+>f80d	20 31 41 00 20 39 41 00 20 41 41 00 20 41 39 00
+>f81d	20 41 31 00 20 41 28 00 20 41 20 00 28 41 20 00
+>f82d	31 41 20 00 39 41 20 00 41 41 20 00 41 39 20 00
+>f83d	41 31 20 00 41 28 20 00 41 2d 2d 00 41 2d 31 00
+>f84d	41 2d 35 00 41 2d 3d 00 41 2d 41 00 3d 2d 41 00
+>f85d	35 2d 41 00 31 2d 41 00 2d 2d 41 00 2d 31 41 00
+>f86d	2d 35 41 00 2d 3d 41 00 2d 41 41 00 2d 41 3d 00
+>f87d	2d 41 35 00 2d 41 31 00 2d 41 2d 00 31 41 2d 00
+>f88d	35 41 2d 00 3d 41 2d 00 41 41 2d 00 41 3d 2d 00
+>f89d	41 35 2d 00 41 31 2d 00 00 00 00 00 00 00 00 00
+>f8ad	00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>f8bd	00 00 00 00 00 00 00 00
 
 ;******  Return to file: newmonitor.asm
 
 
 ;******  Processing file: ps2convert.inc
 
-.f8b0					ASCIIFromScanCode:
->f8b0	00					.byte	$00 ; $00
->f8b1	4c					.byte	$4c ; $01 Esc
->f8b2	31					.byte	$31 ; $02 1
->f8b3	32					.byte	$32 ; $03 2
->f8b4	33					.byte	$33 ; $04 3
->f8b5	34					.byte	$34 ; $05 4
->f8b6	35					.byte	$35 ; $06 5
->f8b7	36					.byte	$36 ; $07 6
->f8b8	37					.byte	$37 ; $08 7
->f8b9	38					.byte	$38 ; $09 8
->f8ba	39					.byte	$39 ; $0a 9
->f8bb	30					.byte	$30 ; $0b 0
->f8bc	2d					.byte	$2d ; $0c -
->f8bd	3d					.byte	$3d ; $0d =
->f8be	08					.byte	$08 ; $0e Backspace
->f8bf	09					.byte	$09 ; $0f Tab
->f8c0	71					.byte	$71 ; $10 q
->f8c1	77					.byte	$77 ; $11 w
->f8c2	65					.byte	$65 ; $12 e
->f8c3	72					.byte	$72 ; $13 r
->f8c4	74					.byte	$74 ; $14 t
->f8c5	79					.byte	$79 ; $15 y
->f8c6	75					.byte	$75 ; $16 u
->f8c7	69					.byte	$69 ; $17 i
->f8c8	6f					.byte	$6f ; $18 o
->f8c9	70					.byte	$70 ; $19 p
->f8ca	5b					.byte	$5b ; $1a [
->f8cb	5d					.byte	$5d ; $1b ]
->f8cc	0d					.byte	$0d ; $1c Enter
->f8cd	00					.byte	$00 ; $1d Left Ctrl
->f8ce	61					.byte	$61 ; $1e a
->f8cf	73					.byte	$73 ; $1f s
->f8d0	64					.byte	$64 ; $20 d
->f8d1	66					.byte	$66 ; $21 f
->f8d2	67					.byte	$67 ; $22 g
->f8d3	68					.byte	$68 ; $23 h
->f8d4	6a					.byte	$6a ; $24 j
->f8d5	6b					.byte	$6b ; $25 k
->f8d6	6c					.byte	$6c ; $26 l
->f8d7	3b					.byte	$3b ; $27 ;
->f8d8	27					.byte	$27 ; $28 '
->f8d9	00					.byte	$00 ; $29
->f8da	00					.byte	$00 ; $2a Left Shift
->f8db	00					.byte	$00 ; $2b
->f8dc	7a					.byte	$7a ; $2c z
->f8dd	78					.byte	$78 ; $2d x
->f8de	63					.byte	$63 ; $2e c
->f8df	76					.byte	$76 ; $2f v
->f8e0	62					.byte	$62 ; $30 b
->f8e1	6e					.byte	$6e ; $31 n
->f8e2	6d					.byte	$6d ; $32 m
->f8e3	2c					.byte	$2c ; $33 ,
->f8e4	2e					.byte	$2e ; $34 .
->f8e5	2f					.byte	$2f ; $35 /
->f8e6	00					.byte	$00 ; $36 Right Shift
->f8e7	00					.byte	$00 ; $37
->f8e8	00					.byte	$00 ; $38 Left Alt
->f8e9	20					.byte	$20 ; $39 Space
->f8ea	00					.byte	$00 ; $3a
->f8eb	00					.byte	$00 ; $3b
->f8ec	00					.byte	$00 ; $3c
->f8ed	00					.byte	$00 ; $3d
->f8ee	00					.byte	$00 ; $3e
->f8ef	00					.byte	$00 ; $3f
->f8f0	00					.byte	$00 ; $40
->f8f1	00					.byte	$00 ; $41
->f8f2	00					.byte	$00 ; $42
->f8f3	00					.byte	$00 ; $43
->f8f4	00					.byte	$00 ; $44
->f8f5	00					.byte	$00 ; $45
->f8f6	00					.byte	$00 ; $46
->f8f7	00					.byte	$00 ; $47
->f8f8	00					.byte	$00 ; $48
->f8f9	00					.byte	$00 ; $49
->f8fa	00					.byte	$00 ; $4a
->f8fb	00					.byte	$00 ; $4b
->f8fc	00					.byte	$00 ; $4c
->f8fd	00					.byte	$00 ; $4d
->f8fe	00					.byte	$00 ; $4e
->f8ff	00					.byte	$00 ; $4f
->f900	00					.byte	$00 ; $50
->f901	00					.byte	$00 ; $51
->f902	00					.byte	$00 ; $52
->f903	00					.byte	$00 ; $53
->f904	00					.byte	$00 ; $54
->f905	00					.byte	$00 ; $55
->f906	00					.byte	$00 ; $56 \\
->f907	00					.byte	$00 ; $57
->f908	00					.byte	$00 ; $58
->f909	00					.byte	$00 ; $59
->f90a	00					.byte	$00 ; $5a
->f90b	00					.byte	$00 ; $5b
->f90c	00					.byte	$00 ; $5c
->f90d	00					.byte	$00 ; $5d
->f90e	00					.byte	$00 ; $5e
->f90f	00					.byte	$00 ; $5f
->f910	00					.byte	$00 ; $60
->f911	00					.byte	$00 ; $61
->f912	00					.byte	$00 ; $62
->f913	00					.byte	$00 ; $63
->f914	00					.byte	$00 ; $64
->f915	00					.byte	$00 ; $65
->f916	00					.byte	$00 ; $66
->f917	00					.byte	$00 ; $67
->f918	00					.byte	$00 ; $68
->f919	00					.byte	$00 ; $69
->f91a	00					.byte	$00 ; $6a
->f91b	00					.byte	$00 ; $6b
->f91c	00					.byte	$00 ; $6c
->f91d	00					.byte	$00 ; $6d
->f91e	00					.byte	$00 ; $6e
->f91f	00					.byte	$00 ; $6f
->f920	00					.byte	$00 ; $70
->f921	00					.byte	$00 ; $71
->f922	00					.byte	$00 ; $72
->f923	00					.byte	$00 ; $73
->f924	00					.byte	$00 ; $74
->f925	00					.byte	$00 ; $75
->f926	00					.byte	$00 ; $76
->f927	00					.byte	$00 ; $77
->f928	00					.byte	$00 ; $78
->f929	00					.byte	$00 ; $79
->f92a	00					.byte	$00 ; $7a
->f92b	00					.byte	$00 ; $7b
->f92c	00					.byte	$00 ; $7c
->f92d	00					.byte	$00 ; $7d
->f92e	00					.byte	$00 ; $7e
->f92f	00					.byte	$00 ; $7f
->f930	00					.byte	$00 ; $80
->f931	00					.byte	$00 ; $81
->f932	00					.byte	$00 ; $82
->f933	00					.byte	$00 ; $83
->f934	00					.byte	$00 ; $84
->f935	00					.byte	$00 ; $85
->f936	00					.byte	$00 ; $86
->f937	00					.byte	$00 ; $87
->f938	00					.byte	$00 ; $88
->f939	00					.byte	$00 ; $89
->f93a	00					.byte	$00 ; $8a
->f93b	00					.byte	$00 ; $8b
->f93c	00					.byte	$00 ; $8c
->f93d	00					.byte	$00 ; $8d
->f93e	00					.byte	$00 ; $8e
->f93f	00					.byte	$00 ; $8f
->f940	ff					.byte	$FF
-.f941					ShiftFixTable:
->f941	31					.byte	$31 ; "1"
->f942	21					.byte	$21 ; "!"
->f943	32					.byte	$32 ; "2"
->f944	40					.byte	$40 ; "@"
->f945	33					.byte	$33 ; "3"
->f946	23					.byte	$23 ; "#"
->f947	34					.byte	$34 ; "4"
->f948	24					.byte	$24 ; "$"
->f949	35					.byte	$35 ; "5"
->f94a	25					.byte	$25 ; "%"
->f94b	36					.byte	$36 ; "6"
->f94c	5e					.byte	$5e ; "^"
->f94d	37					.byte	$37 ; "7"
->f94e	26					.byte	$26 ; "&"
->f94f	38					.byte	$38 ; "8"
->f950	2a					.byte	$2a ; "*"
->f951	39					.byte	$39 ; "9"
->f952	28					.byte	$28 ; "("
->f953	30					.byte	$30 ; "0"
->f954	29					.byte	$29 ; ")"
->f955	2d					.byte	$2d ; "-"
->f956	5f					.byte	$5f ; "_"
->f957	3d					.byte	$3d ; "="
->f958	2b					.byte	$2b ; "+"
->f959	3b					.byte	$3b ; ";"
->f95a	3a					.byte	$3a ; ":"
->f95b	27					.byte	$27 ; "'"
->f95c	22					.byte	$22 ; """
->f95d	2c					.byte	$2c ; ","
->f95e	3c					.byte	$3c ; "<"
->f95f	2e					.byte	$2e ; "."
->f960	3e					.byte	$3e ; ">"
->f961	2f					.byte	$2f ; "/"
->f962	3f					.byte	$3f ; "?"
->f963	ff					.byte	$FF
+.f8c5					ASCIIFromScanCode:
+>f8c5	00					.byte	$00 ; $00
+>f8c6	4c					.byte	$4c ; $01 Esc
+>f8c7	31					.byte	$31 ; $02 1
+>f8c8	32					.byte	$32 ; $03 2
+>f8c9	33					.byte	$33 ; $04 3
+>f8ca	34					.byte	$34 ; $05 4
+>f8cb	35					.byte	$35 ; $06 5
+>f8cc	36					.byte	$36 ; $07 6
+>f8cd	37					.byte	$37 ; $08 7
+>f8ce	38					.byte	$38 ; $09 8
+>f8cf	39					.byte	$39 ; $0a 9
+>f8d0	30					.byte	$30 ; $0b 0
+>f8d1	2d					.byte	$2d ; $0c -
+>f8d2	3d					.byte	$3d ; $0d =
+>f8d3	08					.byte	$08 ; $0e Backspace
+>f8d4	09					.byte	$09 ; $0f Tab
+>f8d5	71					.byte	$71 ; $10 q
+>f8d6	77					.byte	$77 ; $11 w
+>f8d7	65					.byte	$65 ; $12 e
+>f8d8	72					.byte	$72 ; $13 r
+>f8d9	74					.byte	$74 ; $14 t
+>f8da	79					.byte	$79 ; $15 y
+>f8db	75					.byte	$75 ; $16 u
+>f8dc	69					.byte	$69 ; $17 i
+>f8dd	6f					.byte	$6f ; $18 o
+>f8de	70					.byte	$70 ; $19 p
+>f8df	5b					.byte	$5b ; $1a [
+>f8e0	5d					.byte	$5d ; $1b ]
+>f8e1	0d					.byte	$0d ; $1c Enter
+>f8e2	00					.byte	$00 ; $1d Left Ctrl
+>f8e3	61					.byte	$61 ; $1e a
+>f8e4	73					.byte	$73 ; $1f s
+>f8e5	64					.byte	$64 ; $20 d
+>f8e6	66					.byte	$66 ; $21 f
+>f8e7	67					.byte	$67 ; $22 g
+>f8e8	68					.byte	$68 ; $23 h
+>f8e9	6a					.byte	$6a ; $24 j
+>f8ea	6b					.byte	$6b ; $25 k
+>f8eb	6c					.byte	$6c ; $26 l
+>f8ec	3b					.byte	$3b ; $27 ;
+>f8ed	27					.byte	$27 ; $28 '
+>f8ee	00					.byte	$00 ; $29
+>f8ef	00					.byte	$00 ; $2a Left Shift
+>f8f0	00					.byte	$00 ; $2b
+>f8f1	7a					.byte	$7a ; $2c z
+>f8f2	78					.byte	$78 ; $2d x
+>f8f3	63					.byte	$63 ; $2e c
+>f8f4	76					.byte	$76 ; $2f v
+>f8f5	62					.byte	$62 ; $30 b
+>f8f6	6e					.byte	$6e ; $31 n
+>f8f7	6d					.byte	$6d ; $32 m
+>f8f8	2c					.byte	$2c ; $33 ,
+>f8f9	2e					.byte	$2e ; $34 .
+>f8fa	2f					.byte	$2f ; $35 /
+>f8fb	00					.byte	$00 ; $36 Right Shift
+>f8fc	00					.byte	$00 ; $37
+>f8fd	00					.byte	$00 ; $38 Left Alt
+>f8fe	20					.byte	$20 ; $39 Space
+>f8ff	00					.byte	$00 ; $3a
+>f900	00					.byte	$00 ; $3b
+>f901	00					.byte	$00 ; $3c
+>f902	00					.byte	$00 ; $3d
+>f903	00					.byte	$00 ; $3e
+>f904	00					.byte	$00 ; $3f
+>f905	00					.byte	$00 ; $40
+>f906	00					.byte	$00 ; $41
+>f907	00					.byte	$00 ; $42
+>f908	00					.byte	$00 ; $43
+>f909	00					.byte	$00 ; $44
+>f90a	00					.byte	$00 ; $45
+>f90b	00					.byte	$00 ; $46
+>f90c	00					.byte	$00 ; $47
+>f90d	00					.byte	$00 ; $48
+>f90e	00					.byte	$00 ; $49
+>f90f	00					.byte	$00 ; $4a
+>f910	00					.byte	$00 ; $4b
+>f911	00					.byte	$00 ; $4c
+>f912	00					.byte	$00 ; $4d
+>f913	00					.byte	$00 ; $4e
+>f914	00					.byte	$00 ; $4f
+>f915	00					.byte	$00 ; $50
+>f916	00					.byte	$00 ; $51
+>f917	00					.byte	$00 ; $52
+>f918	00					.byte	$00 ; $53
+>f919	00					.byte	$00 ; $54
+>f91a	00					.byte	$00 ; $55
+>f91b	00					.byte	$00 ; $56 \\
+>f91c	00					.byte	$00 ; $57
+>f91d	00					.byte	$00 ; $58
+>f91e	00					.byte	$00 ; $59
+>f91f	00					.byte	$00 ; $5a
+>f920	00					.byte	$00 ; $5b
+>f921	00					.byte	$00 ; $5c
+>f922	00					.byte	$00 ; $5d
+>f923	00					.byte	$00 ; $5e
+>f924	00					.byte	$00 ; $5f
+>f925	00					.byte	$00 ; $60
+>f926	00					.byte	$00 ; $61
+>f927	00					.byte	$00 ; $62
+>f928	00					.byte	$00 ; $63
+>f929	00					.byte	$00 ; $64
+>f92a	00					.byte	$00 ; $65
+>f92b	00					.byte	$00 ; $66
+>f92c	00					.byte	$00 ; $67
+>f92d	00					.byte	$00 ; $68
+>f92e	00					.byte	$00 ; $69
+>f92f	00					.byte	$00 ; $6a
+>f930	00					.byte	$00 ; $6b
+>f931	00					.byte	$00 ; $6c
+>f932	00					.byte	$00 ; $6d
+>f933	00					.byte	$00 ; $6e
+>f934	00					.byte	$00 ; $6f
+>f935	00					.byte	$00 ; $70
+>f936	00					.byte	$00 ; $71
+>f937	00					.byte	$00 ; $72
+>f938	00					.byte	$00 ; $73
+>f939	00					.byte	$00 ; $74
+>f93a	00					.byte	$00 ; $75
+>f93b	00					.byte	$00 ; $76
+>f93c	00					.byte	$00 ; $77
+>f93d	00					.byte	$00 ; $78
+>f93e	00					.byte	$00 ; $79
+>f93f	00					.byte	$00 ; $7a
+>f940	00					.byte	$00 ; $7b
+>f941	00					.byte	$00 ; $7c
+>f942	00					.byte	$00 ; $7d
+>f943	00					.byte	$00 ; $7e
+>f944	00					.byte	$00 ; $7f
+>f945	00					.byte	$00 ; $80
+>f946	00					.byte	$00 ; $81
+>f947	00					.byte	$00 ; $82
+>f948	00					.byte	$00 ; $83
+>f949	00					.byte	$00 ; $84
+>f94a	00					.byte	$00 ; $85
+>f94b	00					.byte	$00 ; $86
+>f94c	00					.byte	$00 ; $87
+>f94d	00					.byte	$00 ; $88
+>f94e	00					.byte	$00 ; $89
+>f94f	00					.byte	$00 ; $8a
+>f950	00					.byte	$00 ; $8b
+>f951	00					.byte	$00 ; $8c
+>f952	00					.byte	$00 ; $8d
+>f953	00					.byte	$00 ; $8e
+>f954	00					.byte	$00 ; $8f
+>f955	ff					.byte	$FF
+.f956					ShiftFixTable:
+>f956	31					.byte	$31 ; "1"
+>f957	21					.byte	$21 ; "!"
+>f958	32					.byte	$32 ; "2"
+>f959	40					.byte	$40 ; "@"
+>f95a	33					.byte	$33 ; "3"
+>f95b	23					.byte	$23 ; "#"
+>f95c	34					.byte	$34 ; "4"
+>f95d	24					.byte	$24 ; "$"
+>f95e	35					.byte	$35 ; "5"
+>f95f	25					.byte	$25 ; "%"
+>f960	36					.byte	$36 ; "6"
+>f961	5e					.byte	$5e ; "^"
+>f962	37					.byte	$37 ; "7"
+>f963	26					.byte	$26 ; "&"
+>f964	38					.byte	$38 ; "8"
+>f965	2a					.byte	$2a ; "*"
+>f966	39					.byte	$39 ; "9"
+>f967	28					.byte	$28 ; "("
+>f968	30					.byte	$30 ; "0"
+>f969	29					.byte	$29 ; ")"
+>f96a	2d					.byte	$2d ; "-"
+>f96b	5f					.byte	$5f ; "_"
+>f96c	3d					.byte	$3d ; "="
+>f96d	2b					.byte	$2b ; "+"
+>f96e	3b					.byte	$3b ; ";"
+>f96f	3a					.byte	$3a ; ":"
+>f970	27					.byte	$27 ; "'"
+>f971	22					.byte	$22 ; """
+>f972	2c					.byte	$2c ; ","
+>f973	3c					.byte	$3c ; "<"
+>f974	2e					.byte	$2e ; "."
+>f975	3e					.byte	$3e ; ">"
+>f976	2f					.byte	$2f ; "/"
+>f977	3f					.byte	$3f ; "?"
+>f978	ff					.byte	$FF
 
 ;******  Return to file: newmonitor.asm
 
@@ -1008,6 +1020,6 @@
 .ffe4	4c 2a f2	jmp $f22a		jmp 	GetKeyIfPressed
 >fffa	46 f1					.word 	NMIHandler                       	; nmi ($FFFA)
 >fffc	33 f2					.word 	SystemReset                         ; reset ($FFFC)
->fffe	67 f4					.word 	IRQHandler                          ; irq ($FFFE)
+>fffe	7c f4					.word 	IRQHandler                          ; irq ($FFFE)
 
 ;******  End of listing

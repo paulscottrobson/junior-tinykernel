@@ -509,6 +509,18 @@ GetKeyIfPressed:
 SystemReset:
 	ldx		#$FF
 	txs
+
+	sei
+	lda 	#$80
+	sta 	0
+	ldx 	#7
+_SRInitLut:
+	txa
+	sta 	8,x
+	dex
+	bpl 	_SRInitLut
+	stz 	0
+
 	ldx 	#EndWorkSpace-StartWorkSpace
 _SRClear:
 	stz 	StartWorkSpace-1,x
@@ -572,6 +584,8 @@ _SRClear:
 	lda 	$700
 	and 	#15
 	ora 	#64
+	jsr 	$FFD2
+	jsr 	$FFD2
 	jsr 	$FFD2
 	;
 	jsr 	INITKEYBOARD
