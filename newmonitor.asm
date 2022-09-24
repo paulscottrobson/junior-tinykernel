@@ -29,10 +29,13 @@ CHeight = 60
 
 IOPageRegister = 1 							; select I/O Page
 
-	.include "vicky.inc"
-	.include "interrupt.inc"
+	.include "include/vicky.inc"
+	.include "include/interrupt.inc"
 
  	*= $F000
+
+	.include "src/hardware.asm"
+	.include "include/ps2convert.inc"
 
 ; ********************************************************************************
 ;                                        
@@ -597,8 +600,6 @@ NextChar:
 	jsr 	PrintCharacter
 	jmp 	NextChar
 
-	.include "hardware.asm"
-	.include "ps2convert.inc"
 
 ; ********************************************************************************
 ;

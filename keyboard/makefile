@@ -5,5 +5,5 @@ include ../documents/common.make
 endif
 
 all: 
-	python scancodes.py >..$(S)ps2convert.inc
+	python scancodes.py >..$(S)include$(S)ps2convert.inc
 	
