@@ -36,7 +36,7 @@ _loop
             sta     zTemp0+1
             cmp     #$e0
             bne     _loop
-
+        
           ; Restore I/O page
             sty     $1
             
