@@ -36,6 +36,7 @@ IOPageRegister = 1 							; select I/O Page
 
 	.include "src/hardware.asm"
 	.include "include/ps2convert.inc"
+	.include "src/init_graphics_palettes.asm"
 
 ; ********************************************************************************
 ;                                        
@@ -590,6 +591,7 @@ _SRClear:
 	jsr 	$FFD2
 	jsr 	$FFD2
 	;
+	jsr 	init_graphics_palettes
 	jsr 	INITKEYBOARD
 	cli
 	jmp 	$8000
