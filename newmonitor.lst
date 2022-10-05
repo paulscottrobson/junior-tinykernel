@@ -1,7 +1,7 @@
 
 ; 64tass Turbo Assembler Macro V1.56.2625 listing file
 ; 64tass -q -c -b -o monitor.rom -L newmonitor.lst newmonitor.asm
-; Sun Oct  2 08:33:59 2022
+; Wed Oct  5 11:34:06 2022
 
 ;Offset	;Hex		;Monitor	;Source
 
@@ -162,7 +162,7 @@
 .f03b	8d 17 d0	sta $d017	            sta VKY_TXT_CURSOR_Y_REG_H
 .f03e	a9 05		lda #$05	            lda #5
 .f040	8d 16 d0	sta $d016	            sta VKY_TXT_CURSOR_Y_REG_L
-.f043	a9 ec		lda #$ec	            lda		#$EC 						; set text colour.
+.f043	a9 fc		lda #$fc	            lda		#$FC   						; set text colour.
 .f045	8d 05 02	sta $0205	            sta 	TextColour
 .f048	60		rts		            rts
 .f049					Init_Text_LUT
