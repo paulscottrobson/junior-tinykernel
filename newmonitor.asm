@@ -353,12 +353,12 @@ _ScrollLoop:
 ; ********************************************************************************
 
 ControlCCheck:
-	lda 	KeyStatus+2 				; check LCtrl pressed
-	and 	#$10
+	lda 	KeyStatus+3 				; check LCtrl pressed
+	and 	#$20
 	beq 	Exit2
-	lda 	KeyStatus+4 				; check C pressed
-	and 	#$02 						; non-zero if so
-	eor 	#$02 				 		; Z set if so.
+	lda 	KeyStatus+5 				; check C pressed
+	and 	#$40 						; non-zero if so
+	eor 	#$40 				 		; Z set if so.
 	rts
 Exit2:
 	lda 	#$FF 						; NZ set

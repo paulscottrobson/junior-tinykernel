@@ -1,7 +1,7 @@
 
 ; 64tass Turbo Assembler Macro V1.56.2625 listing file
 ; 64tass -q -c -b -o monitor.rom -L newmonitor.lst newmonitor.asm
-; Wed Oct  5 11:34:06 2022
+; Thu Oct  6 18:36:12 2022
 
 ;Offset	;Hex		;Monitor	;Source
 
@@ -886,12 +886,12 @@
 .f869	d0 f0		bne $f85b		bne 	_ScrollLoop
 .f86b	60		rts			rts
 .f86c					ControlCCheck:
-.f86c	ad 0a 02	lda $020a		lda 	KeyStatus+2 				; check LCtrl pressed
-.f86f	29 10		and #$10		and 	#$10
+.f86c	ad 0b 02	lda $020b		lda 	KeyStatus+3 				; check LCtrl pressed
+.f86f	29 20		and #$20		and 	#$20
 .f871	f0 08		beq $f87b		beq 	Exit2
-.f873	ad 0c 02	lda $020c		lda 	KeyStatus+4 				; check C pressed
-.f876	29 02		and #$02		and 	#$02 						; non-zero if so
-.f878	49 02		eor #$02		eor 	#$02 				 		; Z set if so.
+.f873	ad 0d 02	lda $020d		lda 	KeyStatus+5 				; check C pressed
+.f876	29 40		and #$40		and 	#$40 						; non-zero if so
+.f878	49 40		eor #$40		eor 	#$40 				 		; Z set if so.
 .f87a	60		rts			rts
 .f87b					Exit2:
 .f87b	a9 ff		lda #$ff		lda 	#$FF 						; NZ set
