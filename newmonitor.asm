@@ -602,6 +602,18 @@ NextChar:
 	jsr 	PrintCharacter
 	jmp 	NextChar
 
+; ********************************************************************************
+;
+;					Read row A of the keyboard status table
+;	
+; ********************************************************************************
+
+ReadKeyboardStatusTable:
+	phx
+	tax
+	lda 	KeyStatus,x
+	plx
+	rts
 
 ; ********************************************************************************
 ;
@@ -617,6 +629,8 @@ NextChar:
 	jmp 	ControlCCheck
 	* = $FFE4
 	jmp 	GetKeyIfPressed
+	* = $FFE7
+	jmp 	ReadKeyboardStatusTable
 
 ; ********************************************************************************
 ;
