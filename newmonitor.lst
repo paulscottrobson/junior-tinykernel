@@ -1,7 +1,7 @@
 
 ; 64tass Turbo Assembler Macro V1.56.2625 listing file
 ; 64tass -q -c -b -o monitor.rom -L newmonitor.lst newmonitor.asm
-; Thu Oct 13 11:25:42 2022
+; Thu Oct 13 14:00:43 2022
 
 ;Offset	;Hex		;Monitor	;Source
 
@@ -1079,6 +1079,7 @@
 .ffe1	4c 6c f8	jmp $f86c		jmp 	ControlCCheck
 .ffe4	4c 06 f9	jmp $f906		jmp 	GetKeyIfPressed
 .ffe7	4c c1 f9	jmp $f9c1		jmp 	ReadKeyboardStatusTable
+.ffea	4c 01 f7	jmp $f701		jmp 	ClearScreen
 >fffa	22 f8					.word 	NMIHandler                       	; nmi ($FFFA)
 >fffc	0f f9					.word 	SystemReset                         ; reset ($FFFC)
 >fffe	97 f1					.word 	IRQHandler                          ; irq ($FFFE)

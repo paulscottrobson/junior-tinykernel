@@ -631,7 +631,9 @@ ReadKeyboardStatusTable:
 	jmp 	GetKeyIfPressed
 	* = $FFE7
 	jmp 	ReadKeyboardStatusTable
-
+	* = $FFEA
+	jmp 	ClearScreen
+	
 ; ********************************************************************************
 ;
 ;									6502 Vectors
