@@ -593,6 +593,11 @@ _SRClear:
 	;
 	jsr 	init_graphics_palettes
 	jsr 	INITKEYBOARD
+
+
+	lda 	#$80+$30+$03 						; LUT 3 , Edit 3, Active 3
+	sta 	$00
+	
 	cli
 	jmp 	$8000
 

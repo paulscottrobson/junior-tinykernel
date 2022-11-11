@@ -1,7 +1,7 @@
 
 ; 64tass Turbo Assembler Macro V1.56.2625 listing file
 ; 64tass -q -c -b -o monitor.rom -L newmonitor.lst newmonitor.asm
-; Thu Oct 13 14:00:43 2022
+; Fri Nov 11 10:16:52 2022
 
 ;Offset	;Hex		;Monitor	;Source
 
@@ -1061,24 +1061,26 @@
 .f9a8	20 d2 ff	jsr $ffd2		jsr 	$FFD2
 .f9ab	20 94 f6	jsr $f694		jsr 	init_graphics_palettes
 .f9ae	20 f8 f0	jsr $f0f8		jsr 	INITKEYBOARD
-.f9b1	58		cli			cli
-.f9b2	4c 00 80	jmp $8000		jmp 	$8000
-.f9b5					NextChar:
-.f9b5	20 f2 f8	jsr $f8f2		jsr 	NewReadKeyboard
-.f9b8	20 83 f7	jsr $f783		jsr 	PrintHex
-.f9bb	20 a6 f7	jsr $f7a6		jsr 	PrintCharacter
-.f9be	4c b5 f9	jmp $f9b5		jmp 	NextChar
-.f9c1					ReadKeyboardStatusTable:
-.f9c1	da		phx			phx
-.f9c2	aa		tax			tax
-.f9c3	bd 08 02	lda $0208,x		lda 	KeyStatus,x
-.f9c6	fa		plx			plx
-.f9c7	60		rts			rts
+.f9b1	a9 b3		lda #$b3		lda 	#$80+$30+$03 						; LUT 3 , Edit 3, Active 3
+.f9b3	85 00		sta $00			sta 	$00
+.f9b5	58		cli			cli
+.f9b6	4c 00 80	jmp $8000		jmp 	$8000
+.f9b9					NextChar:
+.f9b9	20 f2 f8	jsr $f8f2		jsr 	NewReadKeyboard
+.f9bc	20 83 f7	jsr $f783		jsr 	PrintHex
+.f9bf	20 a6 f7	jsr $f7a6		jsr 	PrintCharacter
+.f9c2	4c b9 f9	jmp $f9b9		jmp 	NextChar
+.f9c5					ReadKeyboardStatusTable:
+.f9c5	da		phx			phx
+.f9c6	aa		tax			tax
+.f9c7	bd 08 02	lda $0208,x		lda 	KeyStatus,x
+.f9ca	fa		plx			plx
+.f9cb	60		rts			rts
 .ffcf	4c fb f8	jmp $f8fb		jmp 	FakeKeyboardRead
 .ffd2	4c a6 f7	jmp $f7a6		jmp 	PrintCharacter
 .ffe1	4c 6c f8	jmp $f86c		jmp 	ControlCCheck
 .ffe4	4c 06 f9	jmp $f906		jmp 	GetKeyIfPressed
-.ffe7	4c c1 f9	jmp $f9c1		jmp 	ReadKeyboardStatusTable
+.ffe7	4c c5 f9	jmp $f9c5		jmp 	ReadKeyboardStatusTable
 .ffea	4c 01 f7	jmp $f701		jmp 	ClearScreen
 >fffa	22 f8					.word 	NMIHandler                       	; nmi ($FFFA)
 >fffc	0f f9					.word 	SystemReset                         ; reset ($FFFC)
