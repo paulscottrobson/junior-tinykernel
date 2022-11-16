@@ -597,7 +597,9 @@ _SRClear:
 
 	lda 	#$80+$30+$03 						; LUT 3 , Edit 3, Active 3
 	sta 	$00
-	
+
+	jsr 	init_text_palette
+		
 	cli
 	jmp 	$8000
 
@@ -619,6 +621,35 @@ ReadKeyboardStatusTable:
 	lda 	KeyStatus,x
 	plx
 	rts
+
+
+init_text_palette
+			stz 	1
+            ldx     #0
+_loop       lda     _palette,x
+            sta     TEXT_LUT_FG,x
+            sta     TEXT_LUT_BG,x
+            inx
+            cpx     #64
+            bne     _loop
+            rts
+_palette
+            .dword  $000000
+            .dword  $ffffff
+            .dword  $880000
+            .dword  $aaffee
+            .dword  $cc44cc
+            .dword  $00cc55
+            .dword  $0000aa
+            .dword  $dddd77
+            .dword  $dd8855
+            .dword  $664400
+            .dword  $ff7777
+            .dword  $333333
+            .dword  $777777
+            .dword  $aaff66
+            .dword  $0088ff
+            .dword  $bbbbbb
 
 ; ********************************************************************************
 ;
