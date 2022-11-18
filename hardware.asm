@@ -38,7 +38,7 @@ TinyVickyInitialise:
             lda #5
             sta VKY_TXT_CURSOR_Y_REG_L
 
-            lda		#$EC 						; set text colour.
+            lda		#$F0 						; set text colour.
             sta 	TextColour
 
             rts

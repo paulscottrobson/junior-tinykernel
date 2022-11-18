@@ -5,15 +5,17 @@ include documents/common.make
 endif
 
 
-all: monitor.rom
+all: monitor
 
-monitor.rom : newmonitor.asm 
-	make -B -C keyboard
-	64tass  -q -c -b -o monitor.rom -L newmonitor.lst newmonitor.asm
-	64tass  -q -c -b -o lockout.rom -L lockout.lst lockout.asm
+monitor: 
+	make -C keyboard
+	64tass  -q -c -b -o monitor.rom -L output$(S)newmonitor.lst newmonitor.asm
+	64tass  -q -c -b -o lockout.rom -L output$(S)lockout.lst lockout.asm
+	64tass  -q -c -b -o echo.rom -L output$(S)echo.lst echo.asm
 
-	
-
+run: monitor
+	$(CCOPY) ..$(S)junior-emulator$(S)jr256* .
+	.$(S)jr256 monitor.rom@F000 echo.rom@8000
 
 	
 

@@ -1,0 +1,19 @@
+
+; 64tass Turbo Assembler Macro V1.57.2900 listing file
+; 64tass -q -c -b -o lockout.rom -L output/lockout.lst lockout.asm
+; Fri Nov 18 19:40:35 2022
+
+;Offset	;Hex		;Monitor	;Source
+
+;******  Processing input file: lockout.asm
+
+.f000					NMIHandler:
+.f000					IRQHandler:
+.f000	40		rti				rti
+.f001					SystemReset:
+.f001	4c 01 f0	jmp $f001			jmp 	SystemReset
+>fffa	00 f0					.word 	NMIHandler                       	; nmi ($FFFA)
+>fffc	01 f0					.word 	SystemReset                         ; reset ($FFFC)
+>fffe	00 f0					.word 	IRQHandler                          ; irq ($FFFE)
+
+;******  End of listing
