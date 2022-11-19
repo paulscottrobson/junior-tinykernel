@@ -608,7 +608,6 @@ _SRClear:
 	ora 	#64
 	jsr 	$FFD2
 	jsr 	$FFD2
-	jsr 	$FFD2
 	;
 	jsr 	init_graphics_palettes
 	jsr 	INITKEYBOARD

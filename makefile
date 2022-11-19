@@ -15,7 +15,7 @@ monitor:
 
 run: monitor
 	$(CCOPY) ..$(S)junior-emulator$(S)jr256* .
-	.$(S)jr256 monitor.rom@7E000 echo.rom@8000
+	.$(S)jr256 monitor.rom@m echo.rom@b
 
 	
 
