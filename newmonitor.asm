@@ -33,7 +33,7 @@ IOPageRegister = 1 							; select I/O Page
 	.include "include/vicky.inc"
 	.include "include/interrupt.inc"
 
- 	*= $F000
+ 	*= $E000
 
 	.include "src/hardware.asm"
 	.include "include/ps2convert.inc"
@@ -535,7 +535,7 @@ SystemReset:
 	sei
 	lda 	#$80
 	sta 	0
-	ldx 	#7
+	ldx 	#6
 _SRInitLut:
 	txa
 	sta 	8,x
