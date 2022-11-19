@@ -1,7 +1,7 @@
 
 ; 64tass Turbo Assembler Macro V1.57.2900 listing file
 ; 64tass -q -c -b -o monitor.rom -L output/newmonitor.lst newmonitor.asm
-; Fri Nov 18 19:41:58 2022
+; Sat Nov 19 07:46:20 2022
 
 ;Offset	;Hex		;Monitor	;Source
 
@@ -10,14 +10,16 @@
 =$fc					zTemp0 = $FC 								; 2 byte memory units.
 =6					ClockMhz = 6 								; clock speed in MHz (affects repeat timing)
 =1					KeyboardInvert = 1 							; 0 if keyboard active high, 1 if active low.
+=8					KQSize = 8 									; size of keyboard queue
 =$200					StartWorkSpace = $200
 =$203					XPosition = $203 							; X Character position
 =$204					YPosition = $204 							; Y Character position
 =$205					TextColour = $205 							; Text colour
 =$206					CurrentPage = $206 							; current I/O page
-=$207					LastKey = $207 								; last key press
+=$207					KeysInQueue = $207 							; last key press
 =$208					KeyStatus = $208 							; status bits for keys, 16 x 8 bits = 128 bits.
-=536					EndWorkSpace = $208+16
+=536					KeyboardQueue = $208+16
+=544					EndWorkSpace = KeyboardQueue+KQSize
 =80					CWidth = 80 								; display size
 =60					CHeight = 60
 =1					IOPageRegister = 1 							; select I/O Page
@@ -974,144 +976,161 @@
 .f8ed					_CIKNotControl:
 .f8ed	98		tya				tya
 .f8ee					_CIKExit:
-.f8ee	8d 07 02	sta $0207			sta 	LastKey
-.f8f1	60		rts				rts
-.f8f2					NewReadKeyboard:
-.f8f2	ad 07 02	lda $0207			lda 	LastKey 					; wait for key press
-.f8f5	f0 fb		beq $f8f2			beq 	NewReadKeyboard
-.f8f7	9c 07 02	stz $0207			stz 	LastKey 					; clear queue
-.f8fa	60		rts				rts
-.f8fb					FakeKeyboardRead:
-.f8fb	20 f2 f8	jsr $f8f2			jsr 	NewReadKeyboard 			; echo everything except CR, makes
-.f8fe	c9 0d		cmp #$0d			cmp 	#13 						; it behave like the C64 with it's
-.f900	f0 03		beq $f905			beq 	_FKRExit 					; line editing
-.f902	20 a6 f7	jsr $f7a6			jsr 	PrintCharacter
-.f905					_FKRExit:
-.f905	60		rts				rts
-.f906					GetKeyIfPressed:
-.f906	ad 07 02	lda $0207			lda 	LastKey 					; key or zero in A
-.f909	9c 07 02	stz $0207			stz 	LastKey 					; consume if pressed, no op if not.
-.f90c	09 00		ora #$00			ora 	#0 							; set Z and return
-.f90e	60		rts				rts
-.f90f					SystemReset:
-.f90f	a2 ff		ldx #$ff		ldx		#$FF
-.f911	9a		txs			txs
-.f912	78		sei			sei
-.f913	a9 80		lda #$80		lda 	#$80
-.f915	85 00		sta $00			sta 	0
-.f917	a2 07		ldx #$07		ldx 	#7
-.f919					_SRInitLut:
-.f919	8a		txa			txa
-.f91a	95 08		sta $08,x		sta 	8,x
-.f91c	ca		dex			dex
-.f91d	10 fa		bpl $f919		bpl 	_SRInitLut
-.f91f	64 00		stz $00			stz 	0
-.f921	a2 18		ldx #$18		ldx 	#EndWorkSpace-StartWorkSpace
-.f923					_SRClear:
-.f923	9e ff 01	stz $01ff,x		stz 	StartWorkSpace-1,x
-.f926	ca		dex			dex
-.f927	e0 ff		cpx #$ff		cpx 	#$FF
-.f929	d0 f8		bne $f923		bne 	_SRClear
-.f92b	20 dc f6	jsr $f6dc		jsr 	SelectPage0
-.f92e	a9 ff		lda #$ff	    LDA #$FF
-.f930	8d 68 d6	sta $d668	    STA INT_EDGE_REG0
-.f933	8d 69 d6	sta $d669	    STA INT_EDGE_REG1
-.f936	8d 6c d6	sta $d66c	    STA INT_MASK_REG0
-.f939	8d 6d d6	sta $d66d	    STA INT_MASK_REG1
-.f93c	ad 60 d6	lda $d660	    lda INT_PENDING_REG0
-.f93f	8d 60 d6	sta $d660	    sta INT_PENDING_REG0
-.f942	ad 61 d6	lda $d661	    lda INT_PENDING_REG1
-.f945	8d 61 d6	sta $d661	    sta INT_PENDING_REG1
-.f948	20 00 f0	jsr $f000		jsr 	TinyVickyInitialise
-.f94b	20 49 f0	jsr $f049		jsr 	Init_Text_LUT
-.f94e	20 bf f1	jsr $f1bf		jsr 	LoadGraphicsLUT
-.f951	20 01 f7	jsr $f701		jsr 	ClearScreen
-.f954	ee 04 02	inc $0204		inc 	yPosition
-.f957	ee 04 02	inc $0204		inc 	yPosition
-.f95a	a9 c8		lda #$c8	    lda #200
-.f95c	8d 19 d0	sta $d019	    sta VKY_LINE_CMP_VALUE_LO
-.f95f	a9 00		lda #$00	    lda #0
-.f961	8d 1a d0	sta $d01a	    sta VKY_LINE_CMP_VALUE_HI
-.f964	a9 01		lda #$01	    lda #$01
-.f966	8d 18 d0	sta $d018	    sta VKY_LINE_IRQ_CTRL_REG
-.f969	78		sei		    SEI
-.f96a	ad 60 d6	lda $d660	    lda INT_PENDING_REG0  ; Read the Pending Register &
-.f96d	29 02		and #$02	    and #JR0_INT01_SOL
-.f96f	8d 60 d6	sta $d660	    sta INT_PENDING_REG0  ; Writing it back will clear the Active Bit
-.f972	ad 6c d6	lda $d66c	    lda INT_MASK_REG0
-.f975	29 fd		and #$fd	    and #~JR0_INT01_SOL
-.f977	8d 6c d6	sta $d66c	    sta INT_MASK_REG0
-.f97a	ad 60 d6	lda $d660	    lda INT_PENDING_REG0  ; Read the Pending Register &
-.f97d	29 04		and #$04	    and #JR0_INT02_KBD
-.f97f	8d 60 d6	sta $d660	    sta INT_PENDING_REG0  ; Writing it back will clear the Active Bit
-.f982	ad 6c d6	lda $d66c	    lda INT_MASK_REG0
-.f985	29 fb		and #$fb	    and #~JR0_INT02_KBD
-.f987	8d 6c d6	sta $d66c	    sta INT_MASK_REG0
-.f98a	20 dc f6	jsr $f6dc		jsr 	SelectPage0
-.f98d	a9 01		lda #$01		lda 	#1
-.f98f	8d 00 d1	sta $d100		sta 	$D100
-.f992	9c 01 d1	stz $d101		stz 	$D101
-.f995	9c 02 d1	stz $d102		stz 	$D102
-.f998	9c 03 d1	stz $d103		stz 	$D103
-.f99b	ee 00 07	inc $0700		inc 	$700
-.f99e	ad 00 07	lda $0700		lda 	$700
-.f9a1	29 0f		and #$0f		and 	#15
-.f9a3	09 40		ora #$40		ora 	#64
-.f9a5	20 d2 ff	jsr $ffd2		jsr 	$FFD2
-.f9a8	20 d2 ff	jsr $ffd2		jsr 	$FFD2
-.f9ab	20 94 f6	jsr $f694		jsr 	init_graphics_palettes
-.f9ae	20 f8 f0	jsr $f0f8		jsr 	INITKEYBOARD
-.f9b1	a9 b3		lda #$b3		lda 	#$80+$30+$03 						; LUT 3 , Edit 3, Active 3
-.f9b3	85 00		sta $00			sta 	$00
-.f9b5	20 cf f9	jsr $f9cf		jsr 	init_text_palette
-.f9b8	58		cli			cli
-.f9b9	4c 00 80	jmp $8000		jmp 	$8000
-.f9bc					NextChar:
-.f9bc	20 f2 f8	jsr $f8f2		jsr 	NewReadKeyboard
-.f9bf	20 83 f7	jsr $f783		jsr 	PrintHex
-.f9c2	20 a6 f7	jsr $f7a6		jsr 	PrintCharacter
-.f9c5	4c bc f9	jmp $f9bc		jmp 	NextChar
-.f9c8					ReadKeyboardStatusTable:
-.f9c8	da		phx			phx
-.f9c9	aa		tax			tax
-.f9ca	bd 08 02	lda $0208,x		lda 	KeyStatus,x
-.f9cd	fa		plx			plx
-.f9ce	60		rts			rts
-.f9cf					init_text_palette
-.f9cf	64 01		stz $01					stz 	1
-.f9d1	a2 00		ldx #$00	            ldx     #0
-.f9d3	bd e2 f9	lda $f9e2,x	_loop       lda     _palette,x
-.f9d6	9d 00 d8	sta $d800,x	            sta     TEXT_LUT_FG,x
-.f9d9	9d 40 d8	sta $d840,x	            sta     TEXT_LUT_BG,x
-.f9dc	e8		inx		            inx
-.f9dd	e0 40		cpx #$40	            cpx     #64
-.f9df	d0 f2		bne $f9d3	            bne     _loop
-.f9e1	60		rts		            rts
-.f9e2					_palette
->f9e2	00 00 00 00			            .dword  $000000
->f9e6	ff ff ff 00			            .dword  $ffffff
->f9ea	00 00 88 00			            .dword  $880000
->f9ee	ee ff aa 00			            .dword  $aaffee
->f9f2	cc 44 cc 00			            .dword  $cc44cc
->f9f6	55 cc 00 00			            .dword  $00cc55
->f9fa	aa 00 00 00			            .dword  $0000aa
->f9fe	77 dd dd 00			            .dword  $dddd77
->fa02	55 88 dd 00			            .dword  $dd8855
->fa06	00 44 66 00			            .dword  $664400
->fa0a	77 77 ff 00			            .dword  $ff7777
->fa0e	33 33 33 00			            .dword  $333333
->fa12	77 77 77 00			            .dword  $777777
->fa16	66 ff aa 00			            .dword  $aaff66
->fa1a	ff 88 00 00			            .dword  $0088ff
->fa1e	bb bb bb 00			            .dword  $bbbbbb
-.ffcf	4c fb f8	jmp $f8fb		jmp 	FakeKeyboardRead
+.f8ee	ac 07 02	ldy $0207			ldy 	KeysInQueue 				; space in queue ?
+.f8f1	c0 08		cpy #$08			cpy 	#KQSize
+.f8f3	f0 06		beq $f8fb			beq 	_CIKQueueFull
+.f8f5	99 18 02	sta $0218,y			sta 	KeyboardQueue,y 			; write to queue.
+.f8f8	ee 07 02	inc $0207			inc 	KeysInQueue
+.f8fb					_CIKQueueFull:
+.f8fb	60		rts				rts
+.f8fc					NewReadKeyboard:
+.f8fc	20 0d f9	jsr $f90d			jsr 	GetKeyIfPressed
+.f8ff	f0 fb		beq $f8fc			beq 	NewReadKeyboard
+.f901	60		rts				rts
+.f902					FakeKeyboardRead:
+.f902	20 fc f8	jsr $f8fc			jsr 	NewReadKeyboard 			; echo everything except CR, makes
+.f905	c9 0d		cmp #$0d			cmp 	#13 						; it behave like the C64 with it's
+.f907	f0 03		beq $f90c			beq 	_FKRExit 					; line editing
+.f909	20 a6 f7	jsr $f7a6			jsr 	PrintCharacter
+.f90c					_FKRExit:
+.f90c	60		rts				rts
+.f90d					GetKeyIfPressed:
+.f90d	ad 07 02	lda $0207			lda 	KeysInQueue 				; anything in queue
+.f910	f0 17		beq $f929			beq 	_GIKExit 					; if not, exit with A = 0, Z set
+.f912	ad 18 02	lda $0218			lda 	KeyboardQueue 				; get and push front of queue
+.f915	48		pha				pha
+.f916	da		phx				phx
+.f917	a2 00		ldx #$00			ldx 	#0 							; remove from queue
+.f919					_GIKPop:
+.f919	bd 19 02	lda $0219,x			lda 	KeyboardQueue+1,x
+.f91c	9d 18 02	sta $0218,x			sta 	KeyboardQueue,x
+.f91f	e8		inx				inx
+.f920	e0 08		cpx #$08			cpx 	#KQSize
+.f922	d0 f5		bne $f919			bne 	_GIKPop
+.f924	ce 07 02	dec $0207			dec 	KeysInQueue 				; one fewer in queue
+.f927	fa		plx				plx
+.f928	68		pla				pla 								; restore front of queue setting Z
+.f929					_GIKExit:
+.f929	60		rts				rts
+.f92a					SystemReset:
+.f92a	a2 ff		ldx #$ff		ldx		#$FF
+.f92c	9a		txs			txs
+.f92d	78		sei			sei
+.f92e	a9 80		lda #$80		lda 	#$80
+.f930	85 00		sta $00			sta 	0
+.f932	a2 07		ldx #$07		ldx 	#7
+.f934					_SRInitLut:
+.f934	8a		txa			txa
+.f935	95 08		sta $08,x		sta 	8,x
+.f937	ca		dex			dex
+.f938	10 fa		bpl $f934		bpl 	_SRInitLut
+.f93a	64 00		stz $00			stz 	0
+.f93c	a2 20		ldx #$20		ldx 	#EndWorkSpace-StartWorkSpace
+.f93e					_SRClear:
+.f93e	9e ff 01	stz $01ff,x		stz 	StartWorkSpace-1,x
+.f941	ca		dex			dex
+.f942	e0 ff		cpx #$ff		cpx 	#$FF
+.f944	d0 f8		bne $f93e		bne 	_SRClear
+.f946	20 dc f6	jsr $f6dc		jsr 	SelectPage0
+.f949	a9 ff		lda #$ff	    LDA #$FF
+.f94b	8d 68 d6	sta $d668	    STA INT_EDGE_REG0
+.f94e	8d 69 d6	sta $d669	    STA INT_EDGE_REG1
+.f951	8d 6c d6	sta $d66c	    STA INT_MASK_REG0
+.f954	8d 6d d6	sta $d66d	    STA INT_MASK_REG1
+.f957	ad 60 d6	lda $d660	    lda INT_PENDING_REG0
+.f95a	8d 60 d6	sta $d660	    sta INT_PENDING_REG0
+.f95d	ad 61 d6	lda $d661	    lda INT_PENDING_REG1
+.f960	8d 61 d6	sta $d661	    sta INT_PENDING_REG1
+.f963	20 00 f0	jsr $f000		jsr 	TinyVickyInitialise
+.f966	20 49 f0	jsr $f049		jsr 	Init_Text_LUT
+.f969	20 bf f1	jsr $f1bf		jsr 	LoadGraphicsLUT
+.f96c	20 01 f7	jsr $f701		jsr 	ClearScreen
+.f96f	ee 04 02	inc $0204		inc 	yPosition
+.f972	ee 04 02	inc $0204		inc 	yPosition
+.f975	a9 c8		lda #$c8	    lda #200
+.f977	8d 19 d0	sta $d019	    sta VKY_LINE_CMP_VALUE_LO
+.f97a	a9 00		lda #$00	    lda #0
+.f97c	8d 1a d0	sta $d01a	    sta VKY_LINE_CMP_VALUE_HI
+.f97f	a9 01		lda #$01	    lda #$01
+.f981	8d 18 d0	sta $d018	    sta VKY_LINE_IRQ_CTRL_REG
+.f984	78		sei		    SEI
+.f985	ad 60 d6	lda $d660	    lda INT_PENDING_REG0  ; Read the Pending Register &
+.f988	29 02		and #$02	    and #JR0_INT01_SOL
+.f98a	8d 60 d6	sta $d660	    sta INT_PENDING_REG0  ; Writing it back will clear the Active Bit
+.f98d	ad 6c d6	lda $d66c	    lda INT_MASK_REG0
+.f990	29 fd		and #$fd	    and #~JR0_INT01_SOL
+.f992	8d 6c d6	sta $d66c	    sta INT_MASK_REG0
+.f995	ad 60 d6	lda $d660	    lda INT_PENDING_REG0  ; Read the Pending Register &
+.f998	29 04		and #$04	    and #JR0_INT02_KBD
+.f99a	8d 60 d6	sta $d660	    sta INT_PENDING_REG0  ; Writing it back will clear the Active Bit
+.f99d	ad 6c d6	lda $d66c	    lda INT_MASK_REG0
+.f9a0	29 fb		and #$fb	    and #~JR0_INT02_KBD
+.f9a2	8d 6c d6	sta $d66c	    sta INT_MASK_REG0
+.f9a5	20 dc f6	jsr $f6dc		jsr 	SelectPage0
+.f9a8	a9 01		lda #$01		lda 	#1
+.f9aa	8d 00 d1	sta $d100		sta 	$D100
+.f9ad	9c 01 d1	stz $d101		stz 	$D101
+.f9b0	9c 02 d1	stz $d102		stz 	$D102
+.f9b3	9c 03 d1	stz $d103		stz 	$D103
+.f9b6	ee 00 07	inc $0700		inc 	$700
+.f9b9	ad 00 07	lda $0700		lda 	$700
+.f9bc	29 0f		and #$0f		and 	#15
+.f9be	09 40		ora #$40		ora 	#64
+.f9c0	20 d2 ff	jsr $ffd2		jsr 	$FFD2
+.f9c3	20 d2 ff	jsr $ffd2		jsr 	$FFD2
+.f9c6	20 94 f6	jsr $f694		jsr 	init_graphics_palettes
+.f9c9	20 f8 f0	jsr $f0f8		jsr 	INITKEYBOARD
+.f9cc	a9 b3		lda #$b3		lda 	#$80+$30+$03 						; LUT 3 , Edit 3, Active 3
+.f9ce	85 00		sta $00			sta 	$00
+.f9d0	20 ea f9	jsr $f9ea		jsr 	init_text_palette
+.f9d3	58		cli			cli
+.f9d4	4c 00 80	jmp $8000		jmp 	$8000
+.f9d7					NextChar:
+.f9d7	20 fc f8	jsr $f8fc		jsr 	NewReadKeyboard
+.f9da	20 83 f7	jsr $f783		jsr 	PrintHex
+.f9dd	20 a6 f7	jsr $f7a6		jsr 	PrintCharacter
+.f9e0	4c d7 f9	jmp $f9d7		jmp 	NextChar
+.f9e3					ReadKeyboardStatusTable:
+.f9e3	da		phx			phx
+.f9e4	aa		tax			tax
+.f9e5	bd 08 02	lda $0208,x		lda 	KeyStatus,x
+.f9e8	fa		plx			plx
+.f9e9	60		rts			rts
+.f9ea					init_text_palette
+.f9ea	64 01		stz $01					stz 	1
+.f9ec	a2 00		ldx #$00	            ldx     #0
+.f9ee	bd fd f9	lda $f9fd,x	_loop       lda     _palette,x
+.f9f1	9d 00 d8	sta $d800,x	            sta     TEXT_LUT_FG,x
+.f9f4	9d 40 d8	sta $d840,x	            sta     TEXT_LUT_BG,x
+.f9f7	e8		inx		            inx
+.f9f8	e0 40		cpx #$40	            cpx     #64
+.f9fa	d0 f2		bne $f9ee	            bne     _loop
+.f9fc	60		rts		            rts
+.f9fd					_palette
+>f9fd	00 00 00 00			            .dword  $000000
+>fa01	ff ff ff 00			            .dword  $ffffff
+>fa05	00 00 88 00			            .dword  $880000
+>fa09	ee ff aa 00			            .dword  $aaffee
+>fa0d	cc 44 cc 00			            .dword  $cc44cc
+>fa11	55 cc 00 00			            .dword  $00cc55
+>fa15	aa 00 00 00			            .dword  $0000aa
+>fa19	77 dd dd 00			            .dword  $dddd77
+>fa1d	55 88 dd 00			            .dword  $dd8855
+>fa21	00 44 66 00			            .dword  $664400
+>fa25	77 77 ff 00			            .dword  $ff7777
+>fa29	33 33 33 00			            .dword  $333333
+>fa2d	77 77 77 00			            .dword  $777777
+>fa31	66 ff aa 00			            .dword  $aaff66
+>fa35	ff 88 00 00			            .dword  $0088ff
+>fa39	bb bb bb 00			            .dword  $bbbbbb
+.ffcf	4c 02 f9	jmp $f902		jmp 	FakeKeyboardRead
 .ffd2	4c a6 f7	jmp $f7a6		jmp 	PrintCharacter
 .ffe1	4c 6c f8	jmp $f86c		jmp 	ControlCCheck
-.ffe4	4c 06 f9	jmp $f906		jmp 	GetKeyIfPressed
-.ffe7	4c c8 f9	jmp $f9c8		jmp 	ReadKeyboardStatusTable
+.ffe4	4c 0d f9	jmp $f90d		jmp 	GetKeyIfPressed
+.ffe7	4c e3 f9	jmp $f9e3		jmp 	ReadKeyboardStatusTable
 .ffea	4c 01 f7	jmp $f701		jmp 	ClearScreen
 >fffa	22 f8					.word 	NMIHandler                       	; nmi ($FFFA)
->fffc	0f f9					.word 	SystemReset                         ; reset ($FFFC)
+>fffc	2a f9					.word 	SystemReset                         ; reset ($FFFC)
 >fffe	97 f1					.word 	IRQHandler                          ; irq ($FFFE)
 
 ;******  End of listing

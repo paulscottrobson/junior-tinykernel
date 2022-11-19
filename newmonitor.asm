@@ -13,16 +13,17 @@ zTemp0 = $FC 								; 2 byte memory units.
 
 ClockMhz = 6 								; clock speed in MHz (affects repeat timing)
 KeyboardInvert = 1 							; 0 if keyboard active high, 1 if active low.
+KQSize = 8 									; size of keyboard queue
 
 StartWorkSpace = $200
 XPosition = $203 							; X Character position
 YPosition = $204 							; Y Character position
 TextColour = $205 							; Text colour
 CurrentPage = $206 							; current I/O page
-LastKey = $207 								; last key press
+KeysInQueue = $207 							; last key press
 KeyStatus = $208 							; status bits for keys, 16 x 8 bits = 128 bits.
-
-EndWorkSpace = $208+16
+KeyboardQueue = $208+16
+EndWorkSpace = KeyboardQueue+KQSize
 
 CWidth = 80 								; display size
 CHeight = 60
@@ -463,7 +464,12 @@ _CIKEndShiftCheck:
 _CIKNotControl:		
 		tya 	
 _CIKExit:		
-		sta 	LastKey
+		ldy 	KeysInQueue 				; space in queue ?
+		cpy 	#KQSize
+		beq 	_CIKQueueFull
+		sta 	KeyboardQueue,y 			; write to queue.
+		inc 	KeysInQueue
+_CIKQueueFull:		
 		rts
 
 ; ********************************************************************************
@@ -473,9 +479,8 @@ _CIKExit:
 ; ********************************************************************************
 
 NewReadKeyboard:
-		lda 	LastKey 					; wait for key press
+		jsr 	GetKeyIfPressed
 		beq 	NewReadKeyboard
-		stz 	LastKey 					; clear queue
 		rts
 
 ; ********************************************************************************
@@ -499,9 +504,22 @@ _FKRExit:
 ; ********************************************************************************
 
 GetKeyIfPressed:
-		lda 	LastKey 					; key or zero in A
-		stz 	LastKey 					; consume if pressed, no op if not.
-		ora 	#0 							; set Z and return
+		lda 	KeysInQueue 				; anything in queue
+		beq 	_GIKExit 					; if not, exit with A = 0, Z set
+		lda 	KeyboardQueue 				; get and push front of queue
+		pha
+		phx
+		ldx 	#0 							; remove from queue
+_GIKPop:
+		lda 	KeyboardQueue+1,x
+		sta 	KeyboardQueue,x
+		inx
+		cpx 	#KQSize
+		bne 	_GIKPop
+		dec 	KeysInQueue 				; one fewer in queue
+		plx
+		pla 								; restore front of queue setting Z
+_GIKExit:
 		rts
 		
 ; ********************************************************************************
