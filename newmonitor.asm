@@ -614,10 +614,25 @@ _SRClear:
 	jsr 	init_graphics_palettes
 	jsr 	INITKEYBOARD
 
-
-	lda 	#$80+$30+$03 						; LUT 3 , Edit 3, Active 3
+	lda 	#$80+$30+$00 						; LUT 3 , Edit 3, Active 0
 	sta 	$00
 
+	ldx 	#7 									; map all to memory.
+_InitMMU3:
+	txa
+	sta 	8,x
+	dex
+	bpl 	_InitMMU3
+	lda 	#MONITOR_ADDRESS >> 13 				; map Monitor ROM in
+	sta 	15	
+	lda 	#BASIC_ADDRESS >> 13 				; map BASIC ROM into slots 4 & 5, consecutive pages
+	sta 	12
+	inc 	a
+	sta 	13
+	lda 	#$80+$30+$03 						; LUT 3 , Edit 3, Active 3
+	.byte $DB
+	sta 	$00
+	
 	jsr 	init_text_palette
 		
 	cli
