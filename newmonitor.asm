@@ -45,6 +45,8 @@ IOPageRegister = 1 							; select I/O Page
 ;                                        
 ; ********************************************************************************
 
+	lda 	MONITOR_ADDRESS
+
 SelectPage0:
 	pha
 	lda 	IOPageRegister

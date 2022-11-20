@@ -9,9 +9,9 @@ all: monitor
 
 monitor: 
 	make -C keyboard
-	64tass  -q -c -b -o monitor.rom -L output$(S)newmonitor.lst newmonitor.asm
-	64tass  -q -c -b -o lockout.rom -L output$(S)lockout.lst lockout.asm
-	64tass  -q -c -b -o echo.rom -L output$(S)echo.lst echo.asm
+	64tass  $(AADDRESSES) -q -c -b -o monitor.rom -L output$(S)newmonitor.lst newmonitor.asm
+	64tass  $(AADDRESSES) -q -c -b -o lockout.rom -L output$(S)lockout.lst lockout.asm
+	64tass  $(AADDRESSES) -q -c -b -o echo.rom -L output$(S)echo.lst echo.asm
 
 run: monitor
 	$(CCOPY) ..$(S)junior-emulator$(S)jr256* .

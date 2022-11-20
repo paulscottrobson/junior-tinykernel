@@ -1,9 +1,17 @@
 
 ; 64tass Turbo Assembler Macro V1.57.2900 listing file
-; 64tass -q -c -b -o echo.rom -L output/echo.lst echo.asm
-; Sat Nov 19 18:42:17 2022
+; 64tass "-D MONITOR_ADDRESS=\$E000" "-D LOCKOUT_ADDRESS=\$F000" "-D BASIC_ADDRESS=\$8000" "-D SOURCE_ADDRESS=\$3000" "-D SPRITE_ADDRESS=\$30000" -q -c -b -o echo.rom -L output/echo.lst echo.asm
+; Sun Nov 20 05:17:58 2022
 
 ;Offset	;Hex		;Monitor	;Source
+
+;******  Command line definitions
+
+=$e000					 MONITOR_ADDRESS=$E000
+=$f000					 LOCKOUT_ADDRESS=$F000
+=$8000					 BASIC_ADDRESS=$8000
+=$3000					 SOURCE_ADDRESS=$3000
+=$30000					 SPRITE_ADDRESS=$30000
 
 ;******  Processing input file: echo.asm
 
