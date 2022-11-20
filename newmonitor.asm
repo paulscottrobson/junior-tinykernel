@@ -630,9 +630,7 @@ _InitMMU3:
 	inc 	a
 	sta 	13
 	lda 	#$80+$30+$03 						; LUT 3 , Edit 3, Active 3
-	.byte $DB
 	sta 	$00
-	
 	jsr 	init_text_palette
 		
 	cli
