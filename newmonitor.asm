@@ -533,7 +533,6 @@ _GIKExit:
 SystemReset:
 	ldx		#$FF
 	txs
-
 	sei
 	lda 	#$80
 	sta 	0

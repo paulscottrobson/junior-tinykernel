@@ -1,7 +1,7 @@
 
 ; 64tass Turbo Assembler Macro V1.57.2900 listing file
 ; 64tass "-D MONITOR_ADDRESS=\$E000" "-D LOCKOUT_ADDRESS=\$F000" "-D BASIC_ADDRESS=\$38000" "-D SOURCE_ADDRESS=\$3000" "-D SPRITE_ADDRESS=\$30000" -q -c -b -o monitor.rom -L output/newmonitor.lst newmonitor.asm
-; Sun Nov 20 10:11:03 2022
+; Sun Nov 27 14:54:13 2022
 
 ;Offset	;Hex		;Monitor	;Source
 
@@ -172,7 +172,7 @@
 .e03b	8d 17 d0	sta $d017	            sta VKY_TXT_CURSOR_Y_REG_H
 .e03e	a9 05		lda #$05	            lda #5
 .e040	8d 16 d0	sta $d016	            sta VKY_TXT_CURSOR_Y_REG_L
-.e043	a9 fc		lda #$fc	            lda		#$FC   						; set text colour.
+.e043	a9 16		lda #$16	            lda		#$16   						; set text colour.
 .e045	8d 05 02	sta $0205	            sta 	TextColour
 .e048	60		rts		            rts
 .e049					Init_Text_LUT
