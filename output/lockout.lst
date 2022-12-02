@@ -1,7 +1,7 @@
 
 ; 64tass Turbo Assembler Macro V1.57.2900 listing file
-; 64tass "-D MONITOR_ADDRESS=\$E000" "-D LOCKOUT_ADDRESS=\$F000" "-D BASIC_ADDRESS=\$38000" "-D SOURCE_ADDRESS=\$3000" "-D SPRITE_ADDRESS=\$30000" -q -c -b -o lockout.rom -L output/lockout.lst lockout.asm
-; Fri Dec  2 16:45:48 2022
+; 64tass "-D MONITOR_ADDRESS=\$E000" "-D LOCKOUT_ADDRESS=\$F000" "-D BASIC_ADDRESS=\$38000" "-D SOURCE_ADDRESS=\$28000" "-D SPRITE_ADDRESS=\$30000" -q -c -b -o lockout.rom -L output/lockout.lst lockout.asm
+; Fri Dec  2 17:35:20 2022
 
 ;Offset	;Hex		;Monitor	;Source
 
@@ -10,7 +10,7 @@
 =$e000					 MONITOR_ADDRESS=$E000
 =$f000					 LOCKOUT_ADDRESS=$F000
 =$38000					 BASIC_ADDRESS=$38000
-=$3000					 SOURCE_ADDRESS=$3000
+=$28000					 SOURCE_ADDRESS=$28000
 =$30000					 SPRITE_ADDRESS=$30000
 
 ;******  Processing input file: lockout.asm
