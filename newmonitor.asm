@@ -45,8 +45,6 @@ IOPageRegister = 1 							; select I/O Page
 ;                                        
 ; ********************************************************************************
 
-	lda 	MONITOR_ADDRESS
-
 SelectPage0:
 	pha
 	lda 	IOPageRegister
@@ -609,16 +607,19 @@ _SRClear:
 	ora 	#64
 	jsr 	$FFD2
 	jsr 	$FFD2
+	jsr 	$FFD2
 	;
 	jsr 	init_graphics_palettes
 	jsr 	INITKEYBOARD
+	jsr 	init_text_palette
 
 	lda 	#$80+$30+$00 						; LUT 3 , Edit 3, Active 0
-	sta 	$00
+ 	sta 	$00
 
-	ldx 	#7 									; map all to memory.
+	ldx 	#5 									; map all to memory.
 _InitMMU3:
 	txa
+;	inc 	a 									; WHY DOES REMOVING THIS CAUSE HAYWIRE ????
 	sta 	8,x
 	dex
 	bpl 	_InitMMU3
@@ -628,10 +629,15 @@ _InitMMU3:
 	sta 	12
 	inc 	a
 	sta 	13
+	lda 	#6
+	sta 	14
 	lda 	#$80+$30+$03 						; LUT 3 , Edit 3, Active 3
 	sta 	$00
-	jsr 	init_text_palette
-		
+
+;	.byte 	$DB
+	lda 	#42
+	jsr 	$FFD2
+
 	cli
 	jmp 	($FFF8)
 
