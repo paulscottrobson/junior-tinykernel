@@ -633,7 +633,7 @@ _InitMMU3:
 	jsr 	init_text_palette
 		
 	cli
-	jmp 	$8000
+	jmp 	($FFF8)
 
 NextChar:	
 	jsr 	NewReadKeyboard
@@ -708,10 +708,12 @@ _palette
 ;
 ; ********************************************************************************
 
-	* =	$FFFA
+	* =	$FFF8
 
+	.word 	$8000
 	.word 	NMIHandler                       	; nmi ($FFFA)
 	.word 	SystemReset                         ; reset ($FFFC)
 	.word 	IRQHandler                          ; irq ($FFFE)
 
 	.end 
+
