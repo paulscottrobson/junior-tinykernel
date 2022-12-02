@@ -532,15 +532,27 @@ SystemReset:
 	ldx		#$FF
 	txs
 	sei
-	lda 	#$80
-	sta 	0
-	ldx 	#6
-_SRInitLut:
+
+	lda 	#$80+$30+$00 						; LUT 3 , Edit 3, Active 0
+ 	sta 	$00
+
+	ldx 	#5 									; map all to memory.
+_InitMMU3:
 	txa
+	inc 	a 									; WHY DOES REMOVING THIS CAUSE HAYWIRE ????
 	sta 	8,x
 	dex
-	bpl 	_SRInitLut
-	stz 	0
+	bpl 	_InitMMU3
+	lda 	#MONITOR_ADDRESS >> 13 				; map Monitor ROM in
+	sta 	15	
+	lda 	#BASIC_ADDRESS >> 13 				; map BASIC ROM into slots 4 & 5, consecutive pages
+	sta 	12
+	inc 	a
+	sta 	13
+	lda 	#6
+	sta 	14
+	lda 	#$80+$30+$03 						; LUT 3 , Edit 3, Active 3
+	sta 	$00
 
 	ldx 	#EndWorkSpace-StartWorkSpace
 _SRClear:
@@ -613,28 +625,6 @@ _SRClear:
 	jsr 	INITKEYBOARD
 	jsr 	init_text_palette
 
-	lda 	#$80+$30+$00 						; LUT 3 , Edit 3, Active 0
- 	sta 	$00
-
-	ldx 	#5 									; map all to memory.
-_InitMMU3:
-	txa
-;	inc 	a 									; WHY DOES REMOVING THIS CAUSE HAYWIRE ????
-	sta 	8,x
-	dex
-	bpl 	_InitMMU3
-	lda 	#MONITOR_ADDRESS >> 13 				; map Monitor ROM in
-	sta 	15	
-	lda 	#BASIC_ADDRESS >> 13 				; map BASIC ROM into slots 4 & 5, consecutive pages
-	sta 	12
-	inc 	a
-	sta 	13
-	lda 	#6
-	sta 	14
-	lda 	#$80+$30+$03 						; LUT 3 , Edit 3, Active 3
-	sta 	$00
-
-;	.byte 	$DB
 	lda 	#42
 	jsr 	$FFD2
 
