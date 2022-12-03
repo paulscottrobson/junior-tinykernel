@@ -539,7 +539,7 @@ SystemReset:
 	ldx 	#5 									; map all to memory.
 _InitMMU3:
 	txa
-	inc 	a 									; WHY DOES REMOVING THIS CAUSE HAYWIRE ????
+	inc 	a 									; match up Gadget's settings.
 	sta 	8,x
 	dex
 	bpl 	_InitMMU3
@@ -629,6 +629,11 @@ _SRClear:
 	jsr 	$FFD2
 
 	cli
+	jsr 	RunProgram
+Halt:
+	bra 	Halt	
+
+RunProgram:	
 	jmp 	($FFF8)
 
 NextChar:	

@@ -1,7 +1,7 @@
 
 ; 64tass Turbo Assembler Macro V1.57.2900 listing file
 ; 64tass "-D MONITOR_ADDRESS=\$E000" "-D LOCKOUT_ADDRESS=\$F000" "-D BASIC_ADDRESS=\$38000" "-D SOURCE_ADDRESS=\$28000" "-D SPRITE_ADDRESS=\$30000" -q -c -b -o monitor.rom -L output/newmonitor.lst newmonitor.asm
-; Fri Dec  2 19:16:32 2022
+; Sat Dec  3 10:25:05 2022
 
 ;Offset	;Hex		;Monitor	;Source
 
@@ -1029,7 +1029,7 @@
 .e932	a2 05		ldx #$05		ldx 	#5 									; map all to memory.
 .e934					_InitMMU3:
 .e934	8a		txa			txa
-.e935	1a		inc a			inc 	a 									; WHY DOES REMOVING THIS CAUSE HAYWIRE ????
+.e935	1a		inc a			inc 	a 									; match up Gadget's settings.
 .e936	95 08		sta $08,x		sta 	8,x
 .e938	ca		dex			dex
 .e939	10 f9		bpl $e934		bpl 	_InitMMU3
@@ -1099,54 +1099,58 @@
 .e9d8	20 d2 ff	jsr $ffd2		jsr 	$FFD2
 .e9db	20 94 e6	jsr $e694		jsr 	init_graphics_palettes
 .e9de	20 f8 e0	jsr $e0f8		jsr 	INITKEYBOARD
-.e9e1	20 00 ea	jsr $ea00		jsr 	init_text_palette
+.e9e1	20 05 ea	jsr $ea05		jsr 	init_text_palette
 .e9e4	a9 2a		lda #$2a		lda 	#42
 .e9e6	20 d2 ff	jsr $ffd2		jsr 	$FFD2
 .e9e9	58		cli			cli
-.e9ea	6c f8 ff	jmp ($fff8)		jmp 	($FFF8)
-.e9ed					NextChar:
-.e9ed	20 fc e8	jsr $e8fc		jsr 	NewReadKeyboard
-.e9f0	20 83 e7	jsr $e783		jsr 	PrintHex
-.e9f3	20 a6 e7	jsr $e7a6		jsr 	PrintCharacter
-.e9f6	4c ed e9	jmp $e9ed		jmp 	NextChar
-.e9f9					ReadKeyboardStatusTable:
-.e9f9	da		phx			phx
-.e9fa	aa		tax			tax
-.e9fb	bd 08 02	lda $0208,x		lda 	KeyStatus,x
-.e9fe	fa		plx			plx
-.e9ff	60		rts			rts
-.ea00					init_text_palette
-.ea00	64 01		stz $01					stz 	1
-.ea02	a2 00		ldx #$00	            ldx     #0
-.ea04	bd 13 ea	lda $ea13,x	_loop       lda     _palette,x
-.ea07	9d 00 d8	sta $d800,x	            sta     TEXT_LUT_FG,x
-.ea0a	9d 40 d8	sta $d840,x	            sta     TEXT_LUT_BG,x
-.ea0d	e8		inx		            inx
-.ea0e	e0 40		cpx #$40	            cpx     #64
-.ea10	d0 f2		bne $ea04	            bne     _loop
-.ea12	60		rts		            rts
-.ea13					_palette
->ea13	00 00 00 00			            .dword  $000000
->ea17	ff ff ff 00			            .dword  $ffffff
->ea1b	00 00 88 00			            .dword  $880000
->ea1f	ee ff aa 00			            .dword  $aaffee
->ea23	cc 44 cc 00			            .dword  $cc44cc
->ea27	55 cc 00 00			            .dword  $00cc55
->ea2b	aa 00 00 00			            .dword  $0000aa
->ea2f	77 dd dd 00			            .dword  $dddd77
->ea33	55 88 dd 00			            .dword  $dd8855
->ea37	00 44 66 00			            .dword  $664400
->ea3b	77 77 ff 00			            .dword  $ff7777
->ea3f	33 33 33 00			            .dword  $333333
->ea43	77 77 77 00			            .dword  $777777
->ea47	66 ff aa 00			            .dword  $aaff66
->ea4b	ff 88 00 00			            .dword  $0088ff
->ea4f	bb bb bb 00			            .dword  $bbbbbb
+.e9ea	20 ef e9	jsr $e9ef		jsr 	RunProgram
+.e9ed					Halt:
+.e9ed	80 fe		bra $e9ed		bra 	Halt
+.e9ef					RunProgram:
+.e9ef	6c f8 ff	jmp ($fff8)		jmp 	($FFF8)
+.e9f2					NextChar:
+.e9f2	20 fc e8	jsr $e8fc		jsr 	NewReadKeyboard
+.e9f5	20 83 e7	jsr $e783		jsr 	PrintHex
+.e9f8	20 a6 e7	jsr $e7a6		jsr 	PrintCharacter
+.e9fb	4c f2 e9	jmp $e9f2		jmp 	NextChar
+.e9fe					ReadKeyboardStatusTable:
+.e9fe	da		phx			phx
+.e9ff	aa		tax			tax
+.ea00	bd 08 02	lda $0208,x		lda 	KeyStatus,x
+.ea03	fa		plx			plx
+.ea04	60		rts			rts
+.ea05					init_text_palette
+.ea05	64 01		stz $01					stz 	1
+.ea07	a2 00		ldx #$00	            ldx     #0
+.ea09	bd 18 ea	lda $ea18,x	_loop       lda     _palette,x
+.ea0c	9d 00 d8	sta $d800,x	            sta     TEXT_LUT_FG,x
+.ea0f	9d 40 d8	sta $d840,x	            sta     TEXT_LUT_BG,x
+.ea12	e8		inx		            inx
+.ea13	e0 40		cpx #$40	            cpx     #64
+.ea15	d0 f2		bne $ea09	            bne     _loop
+.ea17	60		rts		            rts
+.ea18					_palette
+>ea18	00 00 00 00			            .dword  $000000
+>ea1c	ff ff ff 00			            .dword  $ffffff
+>ea20	00 00 88 00			            .dword  $880000
+>ea24	ee ff aa 00			            .dword  $aaffee
+>ea28	cc 44 cc 00			            .dword  $cc44cc
+>ea2c	55 cc 00 00			            .dword  $00cc55
+>ea30	aa 00 00 00			            .dword  $0000aa
+>ea34	77 dd dd 00			            .dword  $dddd77
+>ea38	55 88 dd 00			            .dword  $dd8855
+>ea3c	00 44 66 00			            .dword  $664400
+>ea40	77 77 ff 00			            .dword  $ff7777
+>ea44	33 33 33 00			            .dword  $333333
+>ea48	77 77 77 00			            .dword  $777777
+>ea4c	66 ff aa 00			            .dword  $aaff66
+>ea50	ff 88 00 00			            .dword  $0088ff
+>ea54	bb bb bb 00			            .dword  $bbbbbb
 .ffcf	4c 02 e9	jmp $e902		jmp 	FakeKeyboardRead
 .ffd2	4c a6 e7	jmp $e7a6		jmp 	PrintCharacter
 .ffe1	4c 6c e8	jmp $e86c		jmp 	ControlCCheck
 .ffe4	4c 0d e9	jmp $e90d		jmp 	GetKeyIfPressed
-.ffe7	4c f9 e9	jmp $e9f9		jmp 	ReadKeyboardStatusTable
+.ffe7	4c fe e9	jmp $e9fe		jmp 	ReadKeyboardStatusTable
 .ffea	4c 01 e7	jmp $e701		jmp 	ClearScreen
 >fff8	00 80					.word 	$8000
 >fffa	22 e8					.word 	NMIHandler                       	; nmi ($FFFA)
