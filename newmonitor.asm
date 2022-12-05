@@ -539,7 +539,6 @@ SystemReset:
 	ldx 	#5 									; map all to memory.
 _InitMMU3:
 	txa
-	inc 	a 									; match up Gadget's settings.
 	sta 	8,x
 	dex
 	bpl 	_InitMMU3
@@ -549,7 +548,7 @@ _InitMMU3:
 	sta 	12
 	inc 	a
 	sta 	13
-	lda 	#6
+	lda 	#6 									; theoretically ; owned by Kernal.
 	sta 	14
 	lda 	#$80+$30+$03 						; LUT 3 , Edit 3, Active 3
 	sta 	$00
