@@ -628,6 +628,9 @@ _SRClear:
 	jsr 	$FFD2
 
 	cli
+
+;	bra 	NextChar
+
 	jsr 	RunProgram
 Halt:
 	bra 	Halt	
