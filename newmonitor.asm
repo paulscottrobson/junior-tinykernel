@@ -630,6 +630,11 @@ _SRClear:
 	cli
 
 ;	bra 	NextChar
+	
+	;
+	;		Uncomment this to break on start.
+	;
+;	.byte 	$DB
 
 	jsr 	RunProgram
 Halt:
