@@ -6,4 +6,4 @@ endif
 
 all: 
 	python scancodes.py >..$(S)include$(S)ps2convert.inc
-	
+	$(CCOPY) ps2.data ..$(S)..$(S)junior-emulator$(S)emulator$(S)keyboard

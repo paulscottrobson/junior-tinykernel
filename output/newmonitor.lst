@@ -1,7 +1,7 @@
 
 ; 64tass Turbo Assembler Macro V1.57.2900 listing file
 ; 64tass "-D MONITOR_ADDRESS=\$E000" "-D LOCKOUT_ADDRESS=\$F000" "-D BASIC_ADDRESS=\$84000" "-D SOURCE_ADDRESS=\$28000" "-D SPRITE_ADDRESS=\$30000" -q -c -b -o monitor.rom -L output/newmonitor.lst newmonitor.asm
-; Sun Dec 11 18:24:36 2022
+; Sun Dec 11 19:25:50 2022
 
 ;Offset	;Hex		;Monitor	;Source
 
@@ -1129,9 +1129,9 @@
 .e9a5	d0 02		bne $e9a9		bne 	_NotRAM
 .e9a7	a2 11		ldx #$11		ldx 	#Prompt2-Prompt1
 .e9a9					_NotRAM:
-.e9a9	20 7f ea	jsr $ea7f		jsr 	PrintMsg
+.e9a9	20 82 ea	jsr $ea82		jsr 	PrintMsg
 .e9ac	a2 26		ldx #$26		ldx 	#Prompt3-Prompt1
-.e9ae	20 7f ea	jsr $ea7f		jsr 	PrintMsg
+.e9ae	20 82 ea	jsr $ea82		jsr 	PrintMsg
 .e9b1	a9 c8		lda #$c8	    lda #200
 .e9b3	8d 19 d0	sta $d019	    sta VKY_LINE_CMP_VALUE_LO
 .e9b6	a9 00		lda #$00	    lda #0
@@ -1164,93 +1164,94 @@
 .e9fc	20 d2 ff	jsr $ffd2		jsr 	$FFD2
 .e9ff	20 d2 ff	jsr $ffd2		jsr 	$FFD2
 .ea02	20 d2 ff	jsr $ffd2		jsr 	$FFD2
-.ea05	20 b8 ea	jsr $eab8		jsr 	init_text_palette
+.ea05	20 bb ea	jsr $eabb		jsr 	init_text_palette
 .ea08	20 5a e6	jsr $e65a		jsr 	init_graphics_palettes
 .ea0b	a9 2a		lda #$2a		lda 	#42
 .ea0d	20 d2 ff	jsr $ffd2		jsr 	$FFD2
-.ea10	20 8b ea	jsr $ea8b		jsr 	InitStefanyPS2
+.ea10	20 8e ea	jsr $ea8e		jsr 	InitStefanyPS2
 .ea13	58		cli			cli
-.ea14	20 7c ea	jsr $ea7c		jsr 	RunProgram
-.ea17					Halt:
-.ea17	80 fe		bra $ea17		bra 	Halt
-.ea19					Prompt1:
->ea19	0d 52 75 6e 6e 69 6e 67			.text 	13,"Running in RAM",13,0
->ea21	20 69 6e 20 52 41 4d 0d 00
-.ea2a					Prompt2:
->ea2a	0d 52 75 6e 6e 69 6e 67			.text 	13,"Running from Flash",13,0
->ea32	20 66 72 6f 6d 20 46 6c 61 73 68 0d 00
-.ea3f					Prompt3:
->ea3f	0d 52 65 71 75 69 72 65			.text 	13,"Requires new PS/2 Interface : B or 13th Dec FPGA or later",13,13,0
->ea47	73 20 6e 65 77 20 50 53 2f 32 20 49 6e 74 65 72
->ea57	66 61 63 65 20 3a 20 42 20 6f 72 20 31 33 74 68
->ea67	20 44 65 63 20 46 50 47 41 20 6f 72 20 6c 61 74
->ea77	65 72 0d 0d 00
-.ea7c					RunProgram:
-.ea7c	6c f8 ff	jmp ($fff8)		jmp 	($FFF8)
-.ea7f					PrintMsg:
-.ea7f	bd 19 ea	lda $ea19,x		lda 	Prompt1,x
-.ea82	e8		inx			inx
-.ea83	20 6c e7	jsr $e76c		jsr 	PrintCharacter
-.ea86	c9 00		cmp #$00		cmp 	#0
-.ea88	d0 f5		bne $ea7f		bne 	PrintMsg
-.ea8a	60		rts			rts
-.ea8b					InitStefanyPS2:
-.ea8b	64 01		stz $01				stz 	$01
-.ea8d	a9 30		lda #$30			lda 	#$30 						; should reset the hardware
-.ea8f	8d 40 d6	sta $d640			sta 	$D640
-.ea92	9c 40 d6	stz $d640			stz 	$D640
-.ea95	60		rts				rts
-.ea96					EchoScanCodesStefany:
-.ea96					_ESCSLoop:
-.ea96	ad 44 d6	lda $d644			lda 	$D644 						; wait for FIFO not to be empty
-.ea99	29 01		and #$01			and 	#1
-.ea9b	d0 f9		bne $ea96			bne 	_ESCSLoop
-.ea9d	ad 42 d6	lda $d642			lda 	$D642 						; read it in.
-.eaa0	20 49 e7	jsr $e749			jsr 	PrintHex
-.eaa3	80 f1		bra $ea96			bra 	_ESCSLoop
-.eaa5					NextChar:
-.eaa5	20 ec e8	jsr $e8ec		jsr 	NewReadKeyboard
-.eaa8	20 49 e7	jsr $e749		jsr 	PrintHex
-.eaab	20 6c e7	jsr $e76c		jsr 	PrintCharacter
-.eaae	4c a5 ea	jmp $eaa5		jmp 	NextChar
-.eab1					ReadKeyboardStatusTable:
-.eab1	da		phx			phx
-.eab2	aa		tax			tax
-.eab3	bd 10 02	lda $0210,x		lda 	KeyStatus,x
-.eab6	fa		plx			plx
-.eab7	60		rts			rts
-.eab8					init_text_palette
-.eab8	64 01		stz $01					stz 	1
-.eaba	a2 00		ldx #$00	            ldx     #0
-.eabc	bd cb ea	lda $eacb,x	_loop       lda     _palette,x
-.eabf	9d 00 d8	sta $d800,x	            sta     TEXT_LUT_FG,x
-.eac2	9d 40 d8	sta $d840,x	            sta     TEXT_LUT_BG,x
-.eac5	e8		inx		            inx
-.eac6	e0 40		cpx #$40	            cpx     #64
-.eac8	d0 f2		bne $eabc	            bne     _loop
-.eaca	60		rts		            rts
-.eacb					_palette
->eacb	00 00 00 00			            .dword  $000000
->eacf	ff ff ff 00			            .dword  $ffffff
->ead3	00 00 88 00			            .dword  $880000
->ead7	ee ff aa 00			            .dword  $aaffee
->eadb	cc 44 cc 00			            .dword  $cc44cc
->eadf	55 cc 00 00			            .dword  $00cc55
->eae3	aa 00 00 00			            .dword  $0000aa
->eae7	77 dd dd 00			            .dword  $dddd77
->eaeb	55 88 dd 00			            .dword  $dd8855
->eaef	00 44 66 00			            .dword  $664400
->eaf3	77 77 ff 00			            .dword  $ff7777
->eaf7	33 33 33 00			            .dword  $333333
->eafb	77 77 77 00			            .dword  $777777
->eaff	66 ff aa 00			            .dword  $aaff66
->eb03	ff 88 00 00			            .dword  $0088ff
->eb07	bb bb bb 00			            .dword  $bbbbbb
+.ea14	4c a8 ea	jmp $eaa8		jmp 	EchoLoop
+.ea17	20 7f ea	jsr $ea7f		jsr 	RunProgram
+.ea1a					Halt:
+.ea1a	80 fe		bra $ea1a		bra 	Halt
+.ea1c					Prompt1:
+>ea1c	0d 52 75 6e 6e 69 6e 67			.text 	13,"Running in RAM",13,0
+>ea24	20 69 6e 20 52 41 4d 0d 00
+.ea2d					Prompt2:
+>ea2d	0d 52 75 6e 6e 69 6e 67			.text 	13,"Running from Flash",13,0
+>ea35	20 66 72 6f 6d 20 46 6c 61 73 68 0d 00
+.ea42					Prompt3:
+>ea42	0d 52 65 71 75 69 72 65			.text 	13,"Requires new PS/2 Interface : B or 13th Dec FPGA or later",13,13,0
+>ea4a	73 20 6e 65 77 20 50 53 2f 32 20 49 6e 74 65 72
+>ea5a	66 61 63 65 20 3a 20 42 20 6f 72 20 31 33 74 68
+>ea6a	20 44 65 63 20 46 50 47 41 20 6f 72 20 6c 61 74
+>ea7a	65 72 0d 0d 00
+.ea7f					RunProgram:
+.ea7f	6c f8 ff	jmp ($fff8)		jmp 	($FFF8)
+.ea82					PrintMsg:
+.ea82	bd 1c ea	lda $ea1c,x		lda 	Prompt1,x
+.ea85	e8		inx			inx
+.ea86	20 6c e7	jsr $e76c		jsr 	PrintCharacter
+.ea89	c9 00		cmp #$00		cmp 	#0
+.ea8b	d0 f5		bne $ea82		bne 	PrintMsg
+.ea8d	60		rts			rts
+.ea8e					InitStefanyPS2:
+.ea8e	64 01		stz $01				stz 	$01
+.ea90	a9 30		lda #$30			lda 	#$30 						; should reset the hardware
+.ea92	8d 40 d6	sta $d640			sta 	$D640
+.ea95	9c 40 d6	stz $d640			stz 	$D640
+.ea98	60		rts				rts
+.ea99					EchoScanCodesStefany:
+.ea99					_ESCSLoop:
+.ea99	ad 44 d6	lda $d644			lda 	$D644 						; wait for FIFO not to be empty
+.ea9c	29 01		and #$01			and 	#1
+.ea9e	d0 f9		bne $ea99			bne 	_ESCSLoop
+.eaa0	ad 42 d6	lda $d642			lda 	$D642 						; read it in.
+.eaa3	20 49 e7	jsr $e749			jsr 	PrintHex
+.eaa6	80 f1		bra $ea99			bra 	_ESCSLoop
+.eaa8					EchoLoop:
+.eaa8	20 ec e8	jsr $e8ec		jsr 	NewReadKeyboard
+.eaab	20 49 e7	jsr $e749		jsr 	PrintHex
+.eaae	20 6c e7	jsr $e76c		jsr 	PrintCharacter
+.eab1	4c a8 ea	jmp $eaa8		jmp 	EchoLoop
+.eab4					ReadKeyboardStatusTable:
+.eab4	da		phx			phx
+.eab5	aa		tax			tax
+.eab6	bd 10 02	lda $0210,x		lda 	KeyStatus,x
+.eab9	fa		plx			plx
+.eaba	60		rts			rts
+.eabb					init_text_palette
+.eabb	64 01		stz $01					stz 	1
+.eabd	a2 00		ldx #$00	            ldx     #0
+.eabf	bd ce ea	lda $eace,x	_loop       lda     _palette,x
+.eac2	9d 00 d8	sta $d800,x	            sta     TEXT_LUT_FG,x
+.eac5	9d 40 d8	sta $d840,x	            sta     TEXT_LUT_BG,x
+.eac8	e8		inx		            inx
+.eac9	e0 40		cpx #$40	            cpx     #64
+.eacb	d0 f2		bne $eabf	            bne     _loop
+.eacd	60		rts		            rts
+.eace					_palette
+>eace	00 00 00 00			            .dword  $000000
+>ead2	ff ff ff 00			            .dword  $ffffff
+>ead6	00 00 88 00			            .dword  $880000
+>eada	ee ff aa 00			            .dword  $aaffee
+>eade	cc 44 cc 00			            .dword  $cc44cc
+>eae2	55 cc 00 00			            .dword  $00cc55
+>eae6	aa 00 00 00			            .dword  $0000aa
+>eaea	77 dd dd 00			            .dword  $dddd77
+>eaee	55 88 dd 00			            .dword  $dd8855
+>eaf2	00 44 66 00			            .dword  $664400
+>eaf6	77 77 ff 00			            .dword  $ff7777
+>eafa	33 33 33 00			            .dword  $333333
+>eafe	77 77 77 00			            .dword  $777777
+>eb02	66 ff aa 00			            .dword  $aaff66
+>eb06	ff 88 00 00			            .dword  $0088ff
+>eb0a	bb bb bb 00			            .dword  $bbbbbb
 .ffcf	4c f2 e8	jmp $e8f2		jmp 	FakeKeyboardRead
 .ffd2	4c 6c e7	jmp $e76c		jmp 	PrintCharacter
 .ffe1	4c 32 e8	jmp $e832		jmp 	ControlCCheck
 .ffe4	4c fd e8	jmp $e8fd		jmp 	GetKeyIfPressed
-.ffe7	4c b1 ea	jmp $eab1		jmp 	ReadKeyboardStatusTable
+.ffe7	4c b4 ea	jmp $eab4		jmp 	ReadKeyboardStatusTable
 .ffea	4c c7 e6	jmp $e6c7		jmp 	ClearScreen
 >fff8	00 80					.word 	$8000
 >fffa	e8 e7					.word 	NMIHandler                       	; nmi ($FFFA)
