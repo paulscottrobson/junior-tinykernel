@@ -581,6 +581,30 @@ _SRClear:
 	inc 	yPosition
 	inc 	yPosition
 
+	ldx 	#8
+_ShowMMU:
+	lda 	0,x
+	jsr 	PrintHex
+	lda 	#32
+	jsr 	PrintCharacter
+	inx
+	cpx		#16
+	bne 	_ShowMMU
+	lda 	#13
+	jsr 	PrintCharacter
+
+	ldx 	#0
+	lda 	15
+	cmp 	#$3F
+	bne 	_NotRAM
+	ldx 	#Prompt2-Prompt1
+_NotRAM:
+	lda 	Prompt1,x
+	inx
+	jsr 	PrintCharacter		
+	cmp 	#0
+	bne 	_NotRAM
+
     lda #200
     sta VKY_LINE_CMP_VALUE_LO
     lda #0
@@ -641,6 +665,11 @@ _SRClear:
 	jsr 	RunProgram
 Halt:
 	bra 	Halt	
+
+Prompt1:
+	.text 	13,"Running in RAM",13,0
+Prompt2:
+	.text 	13,"Running from Flash",13,0
 
 RunProgram:	
 	jmp 	($FFF8)

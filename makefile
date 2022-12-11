@@ -14,7 +14,7 @@ monitor:
 
 run: monitor
 	$(CCOPY) ..$(S)junior-emulator$(S)jr256* bin
-	bin$(S)jr256 monitor.rom@m echo.rom@b
+	bin$(S)jr256 monitor.rom@m 
 
 	
 
