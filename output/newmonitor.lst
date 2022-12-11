@@ -1,7 +1,7 @@
 
 ; 64tass Turbo Assembler Macro V1.57.2900 listing file
 ; 64tass "-D MONITOR_ADDRESS=\$E000" "-D LOCKOUT_ADDRESS=\$F000" "-D BASIC_ADDRESS=\$38000" "-D SOURCE_ADDRESS=\$28000" "-D SPRITE_ADDRESS=\$30000" -q -c -b -o monitor.rom -L output/newmonitor.lst newmonitor.asm
-; Fri Dec  9 08:30:40 2022
+; Sun Dec 11 04:02:40 2022
 
 ;Offset	;Hex		;Monitor	;Source
 
@@ -1096,11 +1096,11 @@
 .e9d1	20 d2 ff	jsr $ffd2		jsr 	$FFD2
 .e9d4	20 d2 ff	jsr $ffd2		jsr 	$FFD2
 .e9d7	20 d2 ff	jsr $ffd2		jsr 	$FFD2
-.e9da	20 94 e6	jsr $e694		jsr 	init_graphics_palettes
-.e9dd	20 f8 e0	jsr $e0f8		jsr 	INITKEYBOARD
-.e9e0	20 04 ea	jsr $ea04		jsr 	init_text_palette
-.e9e3	a9 2a		lda #$2a		lda 	#42
-.e9e5	20 d2 ff	jsr $ffd2		jsr 	$FFD2
+.e9da	20 04 ea	jsr $ea04		jsr 	init_text_palette
+.e9dd	20 94 e6	jsr $e694		jsr 	init_graphics_palettes
+.e9e0	a9 2a		lda #$2a		lda 	#42
+.e9e2	20 d2 ff	jsr $ffd2		jsr 	$FFD2
+.e9e5	20 f8 e0	jsr $e0f8		jsr 	INITKEYBOARD
 .e9e8	58		cli			cli
 .e9e9	20 ee e9	jsr $e9ee		jsr 	RunProgram
 .e9ec					Halt:

@@ -620,12 +620,14 @@ _SRClear:
 	jsr 	$FFD2
 	jsr 	$FFD2
 	;
-	jsr 	init_graphics_palettes
-	jsr 	INITKEYBOARD
 	jsr 	init_text_palette
+	jsr 	init_graphics_palettes
+
 
 	lda 	#42
 	jsr 	$FFD2
+
+	jsr 	INITKEYBOARD
 
 	cli
 

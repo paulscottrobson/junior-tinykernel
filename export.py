@@ -15,5 +15,5 @@ def export(sourceFile,targetFile):
 
 export("monitor.rom","roms/monitor_rom.h")
 #export("foenix.bin","foenix_charset.h")
-export("Bm437_PhoenixEGA_8x8.bin","roms/foenix_charset.h")
+export("roms/Bm437_PhoenixEGA_8x8.bin","roms/foenix_charset.h")
 #export("basic.rom","basic_rom.h")
