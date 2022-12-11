@@ -584,6 +584,10 @@ _SRClear:
     lda INT_PENDING_REG1
     sta INT_PENDING_REG1     
 
+    stz 	$01
+    lda 	$D670
+    pha
+
 	jsr 	TinyVickyInitialise
 	jsr 	Init_Text_LUT
 	jsr 	LoadGraphicsLUT
@@ -591,6 +595,11 @@ _SRClear:
 	inc 	yPosition
 	inc 	yPosition
 
+	pla
+	jsr 	PrintHex
+	lda 	#13
+	jsr 	PrintCharacter
+	
 	ldx 	#8
 _ShowMMU:
 	lda 	0,x
@@ -661,7 +670,7 @@ _NotRAM:
 	lda 	#42
 	jsr 	$FFD2
 
-	;bra 	EchoScanCodes8042
+	;bra 	EchoScanCodesStefany
 
 	jsr 	INITKEYBOARD
 	cli
@@ -682,6 +691,25 @@ Prompt2:
 
 RunProgram:	
 	jmp 	($FFF8)
+
+; ********************************************************************************
+;
+;							Echo Scan codes Stefany version
+;
+; ********************************************************************************
+
+EchoScanCodesStefany:
+		stz 	$01
+		lda 	#$30 						; should reset the hardware
+		sta 	$D640
+		stz 	$D640
+_ESCSLoop:
+		lda 	$D644 						; wait for FIFO not to be empty
+		and 	#1
+		bne 	_ESCSLoop
+		lda 	$D642 						; read it in.
+		jsr 	PrintHex
+		bra 	_ESCSLoop
 
 ; ********************************************************************************
 ;

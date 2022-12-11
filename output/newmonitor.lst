@@ -1,7 +1,7 @@
 
 ; 64tass Turbo Assembler Macro V1.57.2900 listing file
 ; 64tass "-D MONITOR_ADDRESS=\$E000" "-D LOCKOUT_ADDRESS=\$F000" "-D BASIC_ADDRESS=\$84000" "-D SOURCE_ADDRESS=\$28000" "-D SPRITE_ADDRESS=\$30000" -q -c -b -o monitor.rom -L output/newmonitor.lst newmonitor.asm
-; Sun Dec 11 13:04:19 2022
+; Sun Dec 11 13:26:21 2022
 
 ;Offset	;Hex		;Monitor	;Source
 
@@ -1060,133 +1060,153 @@
 .e96f	8d 60 d6	sta $d660	    sta INT_PENDING_REG0
 .e972	ad 61 d6	lda $d661	    lda INT_PENDING_REG1
 .e975	8d 61 d6	sta $d661	    sta INT_PENDING_REG1
-.e978	20 00 e0	jsr $e000		jsr 	TinyVickyInitialise
-.e97b	20 49 e0	jsr $e049		jsr 	Init_Text_LUT
-.e97e	20 bf e1	jsr $e1bf		jsr 	LoadGraphicsLUT
-.e981	20 01 e7	jsr $e701		jsr 	ClearScreen
-.e984	ee 04 02	inc $0204		inc 	yPosition
-.e987	ee 04 02	inc $0204		inc 	yPosition
-.e98a	a2 08		ldx #$08		ldx 	#8
-.e98c					_ShowMMU:
-.e98c	b5 00		lda $00,x		lda 	0,x
-.e98e	20 83 e7	jsr $e783		jsr 	PrintHex
-.e991	a9 20		lda #$20		lda 	#32
-.e993	20 a6 e7	jsr $e7a6		jsr 	PrintCharacter
-.e996	e8		inx			inx
-.e997	e0 10		cpx #$10		cpx		#16
-.e999	d0 f1		bne $e98c		bne 	_ShowMMU
-.e99b	a9 0d		lda #$0d		lda 	#13
-.e99d	20 a6 e7	jsr $e7a6		jsr 	PrintCharacter
-.e9a0	a2 00		ldx #$00		ldx 	#0
-.e9a2	a5 0f		lda $0f			lda 	15
-.e9a4	c9 3f		cmp #$3f		cmp 	#$3F
-.e9a6	d0 02		bne $e9aa		bne 	_NotRAM
-.e9a8	a2 11		ldx #$11		ldx 	#Prompt2-Prompt1
-.e9aa					_NotRAM:
-.e9aa	bd 1d ea	lda $ea1d,x		lda 	Prompt1,x
-.e9ad	e8		inx			inx
-.e9ae	20 a6 e7	jsr $e7a6		jsr 	PrintCharacter
-.e9b1	c9 00		cmp #$00		cmp 	#0
-.e9b3	d0 f5		bne $e9aa		bne 	_NotRAM
-.e9b5	a9 c8		lda #$c8	    lda #200
-.e9b7	8d 19 d0	sta $d019	    sta VKY_LINE_CMP_VALUE_LO
-.e9ba	a9 00		lda #$00	    lda #0
-.e9bc	8d 1a d0	sta $d01a	    sta VKY_LINE_CMP_VALUE_HI
-.e9bf	a9 01		lda #$01	    lda #$01
-.e9c1	8d 18 d0	sta $d018	    sta VKY_LINE_IRQ_CTRL_REG
-.e9c4	78		sei		    SEI
-.e9c5	ad 60 d6	lda $d660	    lda INT_PENDING_REG0  ; Read the Pending Register &
-.e9c8	29 02		and #$02	    and #JR0_INT01_SOL
-.e9ca	8d 60 d6	sta $d660	    sta INT_PENDING_REG0  ; Writing it back will clear the Active Bit
-.e9cd	ad 6c d6	lda $d66c	    lda INT_MASK_REG0
-.e9d0	29 fd		and #$fd	    and #~JR0_INT01_SOL
-.e9d2	8d 6c d6	sta $d66c	    sta INT_MASK_REG0
-.e9d5	ad 60 d6	lda $d660	    lda INT_PENDING_REG0  ; Read the Pending Register &
-.e9d8	29 04		and #$04	    and #JR0_INT02_KBD
-.e9da	8d 60 d6	sta $d660	    sta INT_PENDING_REG0  ; Writing it back will clear the Active Bit
-.e9dd	ad 6c d6	lda $d66c	    lda INT_MASK_REG0
-.e9e0	29 fb		and #$fb	    and #~JR0_INT02_KBD
-.e9e2	8d 6c d6	sta $d66c	    sta INT_MASK_REG0
-.e9e5	20 dc e6	jsr $e6dc		jsr 	SelectPage0
-.e9e8	a9 01		lda #$01		lda 	#1
-.e9ea	8d 00 d1	sta $d100		sta 	$D100
-.e9ed	9c 01 d1	stz $d101		stz 	$D101
-.e9f0	9c 02 d1	stz $d102		stz 	$D102
-.e9f3	9c 03 d1	stz $d103		stz 	$D103
-.e9f6	ee 00 07	inc $0700		inc 	$700
-.e9f9	ad 00 07	lda $0700		lda 	$700
-.e9fc	29 0f		and #$0f		and 	#15
-.e9fe	09 40		ora #$40		ora 	#64
-.ea00	20 d2 ff	jsr $ffd2		jsr 	$FFD2
-.ea03	20 d2 ff	jsr $ffd2		jsr 	$FFD2
-.ea06	20 d2 ff	jsr $ffd2		jsr 	$FFD2
-.ea09	20 68 ea	jsr $ea68		jsr 	init_text_palette
-.ea0c	20 94 e6	jsr $e694		jsr 	init_graphics_palettes
-.ea0f	a9 2a		lda #$2a		lda 	#42
-.ea11	20 d2 ff	jsr $ffd2		jsr 	$FFD2
-.ea14	20 f8 e0	jsr $e0f8		jsr 	INITKEYBOARD
-.ea17	58		cli			cli
-.ea18	20 43 ea	jsr $ea43		jsr 	RunProgram
-.ea1b					Halt:
-.ea1b	80 fe		bra $ea1b		bra 	Halt
-.ea1d					Prompt1:
->ea1d	0d 52 75 6e 6e 69 6e 67			.text 	13,"Running in RAM",13,0
->ea25	20 69 6e 20 52 41 4d 0d 00
-.ea2e					Prompt2:
->ea2e	0d 52 75 6e 6e 69 6e 67			.text 	13,"Running from Flash",13,0
->ea36	20 66 72 6f 6d 20 46 6c 61 73 68 0d 00
-.ea43					RunProgram:
-.ea43	6c f8 ff	jmp ($fff8)		jmp 	($FFF8)
-.ea46					EchoScanCodes8042:
-.ea46	ad 44 d6	lda $d644		LDA STATUS_PORT 					; wait for buffer to have data
-.ea49	29 01		and #$01		and 	#1
-.ea4b	f0 f9		beq $ea46		beq 	EchoScanCodes8042
-.ea4d	ad 40 d6	lda $d640		LDA KBD_INPT_BUF                    ; Get Scan Code from KeyBoard
-.ea50	20 83 e7	jsr $e783		jsr 	PrintHex 					; and echo it out.
-.ea53	80 f1		bra $ea46		bra 	EchoScanCodes8042
-.ea55					NextChar:
-.ea55	20 fc e8	jsr $e8fc		jsr 	NewReadKeyboard
-.ea58	20 83 e7	jsr $e783		jsr 	PrintHex
-.ea5b	20 a6 e7	jsr $e7a6		jsr 	PrintCharacter
-.ea5e	4c 55 ea	jmp $ea55		jmp 	NextChar
-.ea61					ReadKeyboardStatusTable:
-.ea61	da		phx			phx
-.ea62	aa		tax			tax
-.ea63	bd 08 02	lda $0208,x		lda 	KeyStatus,x
-.ea66	fa		plx			plx
-.ea67	60		rts			rts
-.ea68					init_text_palette
-.ea68	64 01		stz $01					stz 	1
-.ea6a	a2 00		ldx #$00	            ldx     #0
-.ea6c	bd 7b ea	lda $ea7b,x	_loop       lda     _palette,x
-.ea6f	9d 00 d8	sta $d800,x	            sta     TEXT_LUT_FG,x
-.ea72	9d 40 d8	sta $d840,x	            sta     TEXT_LUT_BG,x
-.ea75	e8		inx		            inx
-.ea76	e0 40		cpx #$40	            cpx     #64
-.ea78	d0 f2		bne $ea6c	            bne     _loop
-.ea7a	60		rts		            rts
-.ea7b					_palette
->ea7b	00 00 00 00			            .dword  $000000
->ea7f	ff ff ff 00			            .dword  $ffffff
->ea83	00 00 88 00			            .dword  $880000
->ea87	ee ff aa 00			            .dword  $aaffee
->ea8b	cc 44 cc 00			            .dword  $cc44cc
->ea8f	55 cc 00 00			            .dword  $00cc55
->ea93	aa 00 00 00			            .dword  $0000aa
->ea97	77 dd dd 00			            .dword  $dddd77
->ea9b	55 88 dd 00			            .dword  $dd8855
->ea9f	00 44 66 00			            .dword  $664400
->eaa3	77 77 ff 00			            .dword  $ff7777
->eaa7	33 33 33 00			            .dword  $333333
->eaab	77 77 77 00			            .dword  $777777
->eaaf	66 ff aa 00			            .dword  $aaff66
->eab3	ff 88 00 00			            .dword  $0088ff
->eab7	bb bb bb 00			            .dword  $bbbbbb
+.e978	64 01		stz $01		    stz 	$01
+.e97a	ad 70 d6	lda $d670	    lda 	$D670
+.e97d	48		pha		    pha
+.e97e	20 00 e0	jsr $e000		jsr 	TinyVickyInitialise
+.e981	20 49 e0	jsr $e049		jsr 	Init_Text_LUT
+.e984	20 bf e1	jsr $e1bf		jsr 	LoadGraphicsLUT
+.e987	20 01 e7	jsr $e701		jsr 	ClearScreen
+.e98a	ee 04 02	inc $0204		inc 	yPosition
+.e98d	ee 04 02	inc $0204		inc 	yPosition
+.e990	68		pla			pla
+.e991	20 83 e7	jsr $e783		jsr 	PrintHex
+.e994	a9 0d		lda #$0d		lda 	#13
+.e996	20 a6 e7	jsr $e7a6		jsr 	PrintCharacter
+.e999	a2 08		ldx #$08		ldx 	#8
+.e99b					_ShowMMU:
+.e99b	b5 00		lda $00,x		lda 	0,x
+.e99d	20 83 e7	jsr $e783		jsr 	PrintHex
+.e9a0	a9 20		lda #$20		lda 	#32
+.e9a2	20 a6 e7	jsr $e7a6		jsr 	PrintCharacter
+.e9a5	e8		inx			inx
+.e9a6	e0 10		cpx #$10		cpx		#16
+.e9a8	d0 f1		bne $e99b		bne 	_ShowMMU
+.e9aa	a9 0d		lda #$0d		lda 	#13
+.e9ac	20 a6 e7	jsr $e7a6		jsr 	PrintCharacter
+.e9af	a2 00		ldx #$00		ldx 	#0
+.e9b1	a5 0f		lda $0f			lda 	15
+.e9b3	c9 3f		cmp #$3f		cmp 	#$3F
+.e9b5	d0 02		bne $e9b9		bne 	_NotRAM
+.e9b7	a2 11		ldx #$11		ldx 	#Prompt2-Prompt1
+.e9b9					_NotRAM:
+.e9b9	bd 2e ea	lda $ea2e,x		lda 	Prompt1,x
+.e9bc	e8		inx			inx
+.e9bd	20 a6 e7	jsr $e7a6		jsr 	PrintCharacter
+.e9c0	c9 00		cmp #$00		cmp 	#0
+.e9c2	d0 f5		bne $e9b9		bne 	_NotRAM
+.e9c4	a9 c8		lda #$c8	    lda #200
+.e9c6	8d 19 d0	sta $d019	    sta VKY_LINE_CMP_VALUE_LO
+.e9c9	a9 00		lda #$00	    lda #0
+.e9cb	8d 1a d0	sta $d01a	    sta VKY_LINE_CMP_VALUE_HI
+.e9ce	a9 01		lda #$01	    lda #$01
+.e9d0	8d 18 d0	sta $d018	    sta VKY_LINE_IRQ_CTRL_REG
+.e9d3	78		sei		    SEI
+.e9d4	ad 60 d6	lda $d660	    lda INT_PENDING_REG0  ; Read the Pending Register &
+.e9d7	29 02		and #$02	    and #JR0_INT01_SOL
+.e9d9	8d 60 d6	sta $d660	    sta INT_PENDING_REG0  ; Writing it back will clear the Active Bit
+.e9dc	ad 6c d6	lda $d66c	    lda INT_MASK_REG0
+.e9df	29 fd		and #$fd	    and #~JR0_INT01_SOL
+.e9e1	8d 6c d6	sta $d66c	    sta INT_MASK_REG0
+.e9e4	ad 60 d6	lda $d660	    lda INT_PENDING_REG0  ; Read the Pending Register &
+.e9e7	29 04		and #$04	    and #JR0_INT02_KBD
+.e9e9	8d 60 d6	sta $d660	    sta INT_PENDING_REG0  ; Writing it back will clear the Active Bit
+.e9ec	ad 6c d6	lda $d66c	    lda INT_MASK_REG0
+.e9ef	29 fb		and #$fb	    and #~JR0_INT02_KBD
+.e9f1	8d 6c d6	sta $d66c	    sta INT_MASK_REG0
+.e9f4	20 dc e6	jsr $e6dc		jsr 	SelectPage0
+.e9f7	a9 01		lda #$01		lda 	#1
+.e9f9	8d 00 d1	sta $d100		sta 	$D100
+.e9fc	9c 01 d1	stz $d101		stz 	$D101
+.e9ff	9c 02 d1	stz $d102		stz 	$D102
+.ea02	9c 03 d1	stz $d103		stz 	$D103
+.ea05	ee 00 07	inc $0700		inc 	$700
+.ea08	ad 00 07	lda $0700		lda 	$700
+.ea0b	29 0f		and #$0f		and 	#15
+.ea0d	09 40		ora #$40		ora 	#64
+.ea0f	20 d2 ff	jsr $ffd2		jsr 	$FFD2
+.ea12	20 d2 ff	jsr $ffd2		jsr 	$FFD2
+.ea15	20 d2 ff	jsr $ffd2		jsr 	$FFD2
+.ea18	20 92 ea	jsr $ea92		jsr 	init_text_palette
+.ea1b	20 94 e6	jsr $e694		jsr 	init_graphics_palettes
+.ea1e	a9 2a		lda #$2a		lda 	#42
+.ea20	20 d2 ff	jsr $ffd2		jsr 	$FFD2
+.ea23	80 32		bra $ea57		bra 	EchoScanCodesStefany
+.ea25	20 f8 e0	jsr $e0f8		jsr 	INITKEYBOARD
+.ea28	58		cli			cli
+.ea29	20 54 ea	jsr $ea54		jsr 	RunProgram
+.ea2c					Halt:
+.ea2c	80 fe		bra $ea2c		bra 	Halt
+.ea2e					Prompt1:
+>ea2e	0d 52 75 6e 6e 69 6e 67			.text 	13,"Running in RAM",13,0
+>ea36	20 69 6e 20 52 41 4d 0d 00
+.ea3f					Prompt2:
+>ea3f	0d 52 75 6e 6e 69 6e 67			.text 	13,"Running from Flash",13,0
+>ea47	20 66 72 6f 6d 20 46 6c 61 73 68 0d 00
+.ea54					RunProgram:
+.ea54	6c f8 ff	jmp ($fff8)		jmp 	($FFF8)
+.ea57					EchoScanCodesStefany:
+.ea57	64 01		stz $01				stz 	$01
+.ea59	a9 30		lda #$30			lda 	#$30 						; should reset the hardware
+.ea5b	8d 40 d6	sta $d640			sta 	$D640
+.ea5e	9c 40 d6	stz $d640			stz 	$D640
+.ea61					_ESCSLoop:
+.ea61	ad 44 d6	lda $d644			lda 	$D644
+.ea64	29 01		and #$01			and 	#1
+.ea66	d0 f9		bne $ea61			bne 	_ESCSLoop
+.ea68	ad 42 d6	lda $d642			lda 	$D642
+.ea6b	20 83 e7	jsr $e783			jsr 	PrintHex
+.ea6e	80 f1		bra $ea61			bra 	_ESCSLoop
+.ea70					EchoScanCodes8042:
+.ea70	ad 44 d6	lda $d644		LDA STATUS_PORT 					; wait for buffer to have data
+.ea73	29 01		and #$01		and 	#1
+.ea75	f0 f9		beq $ea70		beq 	EchoScanCodes8042
+.ea77	ad 40 d6	lda $d640		LDA KBD_INPT_BUF                    ; Get Scan Code from KeyBoard
+.ea7a	20 83 e7	jsr $e783		jsr 	PrintHex 					; and echo it out.
+.ea7d	80 f1		bra $ea70		bra 	EchoScanCodes8042
+.ea7f					NextChar:
+.ea7f	20 fc e8	jsr $e8fc		jsr 	NewReadKeyboard
+.ea82	20 83 e7	jsr $e783		jsr 	PrintHex
+.ea85	20 a6 e7	jsr $e7a6		jsr 	PrintCharacter
+.ea88	4c 7f ea	jmp $ea7f		jmp 	NextChar
+.ea8b					ReadKeyboardStatusTable:
+.ea8b	da		phx			phx
+.ea8c	aa		tax			tax
+.ea8d	bd 08 02	lda $0208,x		lda 	KeyStatus,x
+.ea90	fa		plx			plx
+.ea91	60		rts			rts
+.ea92					init_text_palette
+.ea92	64 01		stz $01					stz 	1
+.ea94	a2 00		ldx #$00	            ldx     #0
+.ea96	bd a5 ea	lda $eaa5,x	_loop       lda     _palette,x
+.ea99	9d 00 d8	sta $d800,x	            sta     TEXT_LUT_FG,x
+.ea9c	9d 40 d8	sta $d840,x	            sta     TEXT_LUT_BG,x
+.ea9f	e8		inx		            inx
+.eaa0	e0 40		cpx #$40	            cpx     #64
+.eaa2	d0 f2		bne $ea96	            bne     _loop
+.eaa4	60		rts		            rts
+.eaa5					_palette
+>eaa5	00 00 00 00			            .dword  $000000
+>eaa9	ff ff ff 00			            .dword  $ffffff
+>eaad	00 00 88 00			            .dword  $880000
+>eab1	ee ff aa 00			            .dword  $aaffee
+>eab5	cc 44 cc 00			            .dword  $cc44cc
+>eab9	55 cc 00 00			            .dword  $00cc55
+>eabd	aa 00 00 00			            .dword  $0000aa
+>eac1	77 dd dd 00			            .dword  $dddd77
+>eac5	55 88 dd 00			            .dword  $dd8855
+>eac9	00 44 66 00			            .dword  $664400
+>eacd	77 77 ff 00			            .dword  $ff7777
+>ead1	33 33 33 00			            .dword  $333333
+>ead5	77 77 77 00			            .dword  $777777
+>ead9	66 ff aa 00			            .dword  $aaff66
+>eadd	ff 88 00 00			            .dword  $0088ff
+>eae1	bb bb bb 00			            .dword  $bbbbbb
 .ffcf	4c 02 e9	jmp $e902		jmp 	FakeKeyboardRead
 .ffd2	4c a6 e7	jmp $e7a6		jmp 	PrintCharacter
 .ffe1	4c 6c e8	jmp $e86c		jmp 	ControlCCheck
 .ffe4	4c 0d e9	jmp $e90d		jmp 	GetKeyIfPressed
-.ffe7	4c 61 ea	jmp $ea61		jmp 	ReadKeyboardStatusTable
+.ffe7	4c 8b ea	jmp $ea8b		jmp 	ReadKeyboardStatusTable
 .ffea	4c 01 e7	jmp $e701		jmp 	ClearScreen
 >fff8	00 80					.word 	$8000
 >fffa	22 e8					.word 	NMIHandler                       	; nmi ($FFFA)
