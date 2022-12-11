@@ -21,8 +21,10 @@ YPosition = $204 							; Y Character position
 TextColour = $205 							; Text colour
 CurrentPage = $206 							; current I/O page
 KeysInQueue = $207 							; last key press
-KeyStatus = $208 							; status bits for keys, 16 x 8 bits = 128 bits.
-KeyboardQueue = $208+16
+ReleaseFlag = $208 							; set to non-zero if release code (F0) received
+ScanShiftFlag = $209 						; set to zero for shift, $80 for shifted scans ($E0)
+KeyStatus = $210 							; status bits for keys, 32 x 8 bits = 256 bits.
+KeyboardQueue = $210+32
 EndWorkSpace = KeyboardQueue+KQSize
 
 CWidth = 80 								; display size
@@ -376,24 +378,32 @@ HandleKeyboard:
 		phx
 		phy
 
-;		pha
-;		jsr 	PrintHex
-;		lda 	#'<'
-;		jsr 	PrintCharacter
-;		pla
+		cmp 	#$80 							; E0 (Scan shift)
+		bcc 	_KeyBit 						; if 00-7F then it is a keystroke.
+		cmp 	#$E0
+		beq 	_HKIsShift 						; if = $E0 then it is a shifted key on the keyboard.
+		cmp 	#$F0 							; if = $F0 then it is a release.
+		bne 	_HKExit
+		sta 	ReleaseFlag 					; set release flag to non-zero.
+		bra 	_HKExit
+_HKIsShift:
+		lda 	#$80 							; set scan shift flag to $80		
+		sta 	ScanShiftFlag 
+		bra 	_HKExit
 
-		pha 									; save new code
+_KeyBit:
+		ora 	ScanShiftFlag 					; A now contains the scan shift flag.
+		sta 	ScanShiftFlag 					; store result there
 		;
 		;		Set/clear bit in the KeyStatus area
 		;
-		pha 									; 2nd save
-		pha 									; 3rd save
 		and 	#$7F
 		lsr 	a 								; divide by 8 -> X, offset in table
 		lsr 	a
 		lsr 	a
 		tax
-		pla 									; restore 3rd save
+
+		lda 	ScanShiftFlag 					; get the key press back.
 		and 	#7 								; count in Y
 		tay
 		lda 	#0
@@ -402,8 +412,8 @@ _HKGetBits:
 		rol 	a
 		dey
 		bpl 	_HKGetBits
-		ply 									; restore 2nd save
-		bmi 	_HKRelease
+		lda 	ReleaseFlag 					; is the release flag set
+		bne 	_HKRelease
 		ora 	KeyStatus,x  					; set bit
 		bra 	_HKWrite
 _HKRelease:
@@ -414,9 +424,13 @@ _HKWrite:
 		;
 		;		Process key if appropriate
 		;
-		pla 									; restore new code
-		bmi 	_HKExit
+		lda 	ScanShiftFlag 					; restore new code
+		ldx 	ReleaseFlag
+		bne 	_HKNotInsert 					; process key down
 		jsr 	ConvertInsertKey
+_HKNotInsert:
+		stz 	ReleaseFlag 					; zero both flags.
+		stz 	ScanShiftFlag		
 _HKExit:				
 		ply
 		plx
@@ -433,6 +447,7 @@ ConvertInsertKey:
 		tax 								; scan code in X
 		lda 	ASCIIFromScanCode,x 		; get ASCII unshifted 
 		beq 	_CIKExit 					; key not known
+
 		tay 								; save in Y
 		bmi 	_CIKEndShiftCheck 			; if bit 7 was set shift doesn't affect this.
 		lda 	KeyStatus+5 				; check left shift
@@ -670,15 +685,10 @@ _NotRAM:
 
 	jsr 	InitStefanyPS2
 	cli
-
-Halt2:
-	bra 	Halt2
-
-
 	;
 	;		Uncommenting this puts the keyboard into an echo loop.
 	;
-	;bra 	NextChar
+	jmp 	NextChar
 
 	jsr 	RunProgram
 Halt:

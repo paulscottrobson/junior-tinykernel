@@ -129,18 +129,16 @@ IRQHandler
                 CMP #JR0_INT02_KBD
                 BNE EXIT_IRQ_HANDLE
                 ; clear pending
-;
-;               LDA KBD_INPT_BUF                    ; Get Scan Code from KeyBoard
-;               jsr     HandleKeyboard
 
                 lda     $D644                       ; shouldn't be empty
                 and     #1
                 bne     EXIT_IRQ_HANDLE
 
-                lda     #">"
-                jsr     PrintCharacter
+;                lda     #">"
+;               jsr     PrintCharacter
                 lda     $D642            
-                jsr     PrintHex
+                jsr     HandleKeyboard
+;                jsr     PrintHex
 
 
 EXIT_IRQ_HANDLE:

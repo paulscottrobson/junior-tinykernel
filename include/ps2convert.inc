@@ -3,99 +3,99 @@
 ;
 ASCIIFromScanCode:
 	.byte	$00 ; $00 
-	.byte	$4c ; $01 Esc
-	.byte	$31 ; $02 1
-	.byte	$32 ; $03 2
-	.byte	$33 ; $04 3
-	.byte	$34 ; $05 4
-	.byte	$35 ; $06 5
-	.byte	$36 ; $07 6
-	.byte	$37 ; $08 7
-	.byte	$38 ; $09 8
-	.byte	$39 ; $0a 9
-	.byte	$30 ; $0b 0
-	.byte	$2d ; $0c -
-	.byte	$3d ; $0d =
-	.byte	$08 ; $0e Backspace
-	.byte	$09 ; $0f Tab
-	.byte	$71 ; $10 q
-	.byte	$77 ; $11 w
-	.byte	$65 ; $12 e
-	.byte	$72 ; $13 r
-	.byte	$74 ; $14 t
-	.byte	$79 ; $15 y
-	.byte	$75 ; $16 u
-	.byte	$69 ; $17 i
-	.byte	$6f ; $18 o
-	.byte	$70 ; $19 p
-	.byte	$5b ; $1a [
-	.byte	$5d ; $1b ]
-	.byte	$0d ; $1c Enter
-	.byte	$00 ; $1d Left Ctrl
-	.byte	$61 ; $1e a
-	.byte	$73 ; $1f s
-	.byte	$64 ; $20 d
-	.byte	$66 ; $21 f
-	.byte	$67 ; $22 g
-	.byte	$68 ; $23 h
-	.byte	$6a ; $24 j
-	.byte	$6b ; $25 k
-	.byte	$6c ; $26 l
-	.byte	$3b ; $27 ;
-	.byte	$27 ; $28 '
-	.byte	$00 ; $29 
-	.byte	$00 ; $2a Left Shift
-	.byte	$00 ; $2b 
-	.byte	$7a ; $2c z
-	.byte	$78 ; $2d x
-	.byte	$63 ; $2e c
-	.byte	$76 ; $2f v
-	.byte	$62 ; $30 b
-	.byte	$6e ; $31 n
-	.byte	$6d ; $32 m
-	.byte	$2c ; $33 ,
-	.byte	$2e ; $34 .
-	.byte	$2f ; $35 /
-	.byte	$00 ; $36 Right Shift
+	.byte	$00 ; $01 
+	.byte	$00 ; $02 
+	.byte	$00 ; $03 
+	.byte	$00 ; $04 
+	.byte	$00 ; $05 
+	.byte	$00 ; $06 
+	.byte	$00 ; $07 
+	.byte	$00 ; $08 
+	.byte	$00 ; $09 
+	.byte	$00 ; $0a 
+	.byte	$00 ; $0b 
+	.byte	$00 ; $0c 
+	.byte	$09 ; $0d chr$(9)
+	.byte	$60 ; $0e '`'
+	.byte	$00 ; $0f 
+	.byte	$00 ; $10 
+	.byte	$00 ; $11 
+	.byte	$00 ; $12 
+	.byte	$00 ; $13 
+	.byte	$00 ; $14 
+	.byte	$71 ; $15 'q'
+	.byte	$31 ; $16 '1'
+	.byte	$00 ; $17 
+	.byte	$00 ; $18 
+	.byte	$00 ; $19 
+	.byte	$7a ; $1a 'z'
+	.byte	$73 ; $1b 's'
+	.byte	$61 ; $1c 'a'
+	.byte	$77 ; $1d 'w'
+	.byte	$32 ; $1e '2'
+	.byte	$00 ; $1f 
+	.byte	$00 ; $20 
+	.byte	$63 ; $21 'c'
+	.byte	$78 ; $22 'x'
+	.byte	$64 ; $23 'd'
+	.byte	$65 ; $24 'e'
+	.byte	$34 ; $25 '4'
+	.byte	$33 ; $26 '3'
+	.byte	$00 ; $27 
+	.byte	$00 ; $28 
+	.byte	$20 ; $29 ' '
+	.byte	$76 ; $2a 'v'
+	.byte	$66 ; $2b 'f'
+	.byte	$74 ; $2c 't'
+	.byte	$72 ; $2d 'r'
+	.byte	$35 ; $2e '5'
+	.byte	$00 ; $2f 
+	.byte	$00 ; $30 
+	.byte	$6e ; $31 'n'
+	.byte	$62 ; $32 'b'
+	.byte	$68 ; $33 'h'
+	.byte	$67 ; $34 'g'
+	.byte	$79 ; $35 'y'
+	.byte	$36 ; $36 '6'
 	.byte	$00 ; $37 
-	.byte	$00 ; $38 Left Alt
-	.byte	$20 ; $39 Space
-	.byte	$00 ; $3a 
-	.byte	$00 ; $3b 
-	.byte	$00 ; $3c 
-	.byte	$00 ; $3d 
-	.byte	$00 ; $3e 
+	.byte	$00 ; $38 
+	.byte	$00 ; $39 
+	.byte	$6d ; $3a 'm'
+	.byte	$6a ; $3b 'j'
+	.byte	$75 ; $3c 'u'
+	.byte	$37 ; $3d '7'
+	.byte	$38 ; $3e '8'
 	.byte	$00 ; $3f 
 	.byte	$00 ; $40 
-	.byte	$00 ; $41 
-	.byte	$00 ; $42 
-	.byte	$00 ; $43 
-	.byte	$00 ; $44 
-	.byte	$00 ; $45 
-	.byte	$00 ; $46 
+	.byte	$2c ; $41 ','
+	.byte	$6b ; $42 'k'
+	.byte	$69 ; $43 'i'
+	.byte	$6f ; $44 'o'
+	.byte	$30 ; $45 '0'
+	.byte	$39 ; $46 '9'
 	.byte	$00 ; $47 
 	.byte	$00 ; $48 
-	.byte	$00 ; $49 
-	.byte	$00 ; $4a 
-	.byte	$00 ; $4b 
-	.byte	$00 ; $4c 
-	.byte	$00 ; $4d 
-	.byte	$00 ; $4e 
+	.byte	$2e ; $49 '.'
+	.byte	$2f ; $4a '/'
+	.byte	$6c ; $4b 'l'
+	.byte	$3b ; $4c ';'
+	.byte	$70 ; $4d 'p'
+	.byte	$2d ; $4e '-'
 	.byte	$00 ; $4f 
 	.byte	$00 ; $50 
 	.byte	$00 ; $51 
-	.byte	$00 ; $52 
+	.byte	$27 ; $52 '''
 	.byte	$00 ; $53 
-	.byte	$00 ; $54 
-	.byte	$00 ; $55 
-	.byte	$00 ; $56 \\
+	.byte	$5b ; $54 '['
+	.byte	$3d ; $55 '='
+	.byte	$00 ; $56 
 	.byte	$00 ; $57 
 	.byte	$00 ; $58 
 	.byte	$00 ; $59 
-	.byte	$00 ; $5a 
-	.byte	$00 ; $5b 
+	.byte	$0d ; $5a chr$(13)
+	.byte	$5d ; $5b ']'
 	.byte	$00 ; $5c 
-	.byte	$00 ; $5d 
+	.byte	$7c ; $5d '|'
 	.byte	$00 ; $5e 
 	.byte	$00 ; $5f 
 	.byte	$00 ; $60 
@@ -104,23 +104,23 @@ ASCIIFromScanCode:
 	.byte	$00 ; $63 
 	.byte	$00 ; $64 
 	.byte	$00 ; $65 
-	.byte	$00 ; $66 
+	.byte	$08 ; $66 chr$(8)
 	.byte	$00 ; $67 
 	.byte	$00 ; $68 
 	.byte	$00 ; $69 
 	.byte	$00 ; $6a 
-	.byte	$00 ; $6b 
+	.byte	$02 ; $6b chr$(2)
 	.byte	$00 ; $6c 
 	.byte	$00 ; $6d 
 	.byte	$00 ; $6e 
 	.byte	$00 ; $6f 
 	.byte	$00 ; $70 
 	.byte	$00 ; $71 
-	.byte	$00 ; $72 
+	.byte	$0e ; $72 chr$(14)
 	.byte	$00 ; $73 
-	.byte	$00 ; $74 
-	.byte	$00 ; $75 
-	.byte	$00 ; $76 
+	.byte	$06 ; $74 chr$(6)
+	.byte	$10 ; $75 chr$(16)
+	.byte	$1b ; $76 chr$(27)
 	.byte	$00 ; $77 
 	.byte	$00 ; $78 
 	.byte	$00 ; $79 
@@ -146,43 +146,139 @@ ASCIIFromScanCode:
 	.byte	$00 ; $8d 
 	.byte	$00 ; $8e 
 	.byte	$00 ; $8f 
+	.byte	$00 ; $90 
+	.byte	$00 ; $91 
+	.byte	$00 ; $92 
+	.byte	$00 ; $93 
+	.byte	$00 ; $94 
+	.byte	$00 ; $95 
+	.byte	$00 ; $96 
+	.byte	$00 ; $97 
+	.byte	$00 ; $98 
+	.byte	$00 ; $99 
+	.byte	$00 ; $9a 
+	.byte	$00 ; $9b 
+	.byte	$00 ; $9c 
+	.byte	$00 ; $9d 
+	.byte	$00 ; $9e 
+	.byte	$00 ; $9f 
+	.byte	$00 ; $a0 
+	.byte	$00 ; $a1 
+	.byte	$00 ; $a2 
+	.byte	$00 ; $a3 
+	.byte	$00 ; $a4 
+	.byte	$00 ; $a5 
+	.byte	$00 ; $a6 
+	.byte	$00 ; $a7 
+	.byte	$00 ; $a8 
+	.byte	$00 ; $a9 
+	.byte	$00 ; $aa 
+	.byte	$00 ; $ab 
+	.byte	$00 ; $ac 
+	.byte	$00 ; $ad 
+	.byte	$00 ; $ae 
+	.byte	$00 ; $af 
+	.byte	$00 ; $b0 
+	.byte	$00 ; $b1 
+	.byte	$00 ; $b2 
+	.byte	$00 ; $b3 
+	.byte	$00 ; $b4 
+	.byte	$00 ; $b5 
+	.byte	$00 ; $b6 
+	.byte	$00 ; $b7 
+	.byte	$00 ; $b8 
+	.byte	$00 ; $b9 
+	.byte	$00 ; $ba 
+	.byte	$00 ; $bb 
+	.byte	$00 ; $bc 
+	.byte	$00 ; $bd 
+	.byte	$00 ; $be 
+	.byte	$00 ; $bf 
+	.byte	$00 ; $c0 
+	.byte	$00 ; $c1 
+	.byte	$00 ; $c2 
+	.byte	$00 ; $c3 
+	.byte	$00 ; $c4 
+	.byte	$00 ; $c5 
+	.byte	$00 ; $c6 
+	.byte	$00 ; $c7 
+	.byte	$00 ; $c8 
+	.byte	$00 ; $c9 
+	.byte	$00 ; $ca 
+	.byte	$00 ; $cb 
+	.byte	$00 ; $cc 
+	.byte	$00 ; $cd 
+	.byte	$00 ; $ce 
+	.byte	$00 ; $cf 
+	.byte	$00 ; $d0 
+	.byte	$00 ; $d1 
+	.byte	$00 ; $d2 
+	.byte	$00 ; $d3 
+	.byte	$00 ; $d4 
+	.byte	$00 ; $d5 
+	.byte	$00 ; $d6 
+	.byte	$00 ; $d7 
+	.byte	$00 ; $d8 
+	.byte	$00 ; $d9 
+	.byte	$00 ; $da 
+	.byte	$00 ; $db 
+	.byte	$00 ; $dc 
+	.byte	$00 ; $dd 
+	.byte	$00 ; $de 
+	.byte	$00 ; $df 
+	.byte	$00 ; $e0 
+	.byte	$00 ; $e1 
+	.byte	$00 ; $e2 
+	.byte	$00 ; $e3 
+	.byte	$00 ; $e4 
+	.byte	$00 ; $e5 
+	.byte	$00 ; $e6 
+	.byte	$00 ; $e7 
+	.byte	$00 ; $e8 
+	.byte	$05 ; $e9 chr$(5)
+	.byte	$00 ; $ea 
+	.byte	$02 ; $eb chr$(2)
+	.byte	$01 ; $ec chr$(1)
+	.byte	$00 ; $ed 
+	.byte	$00 ; $ee 
+	.byte	$00 ; $ef 
+	.byte	$00 ; $f0 
+	.byte	$04 ; $f1 chr$(4)
+	.byte	$0e ; $f2 chr$(14)
+	.byte	$00 ; $f3 
+	.byte	$06 ; $f4 chr$(6)
+	.byte	$10 ; $f5 chr$(16)
+	.byte	$00 ; $f6 
+	.byte	$00 ; $f7 
+	.byte	$00 ; $f8 
+	.byte	$00 ; $f9 
+	.byte	$00 ; $fa 
+	.byte	$00 ; $fb 
+	.byte	$00 ; $fc 
+	.byte	$00 ; $fd 
+	.byte	$00 ; $fe 
+	.byte	$00 ; $ff 
 	.byte	$FF
 
 ShiftFixTable:
 
-	.byte	$31 ; "1"
-	.byte	$21 ; "!"
-	.byte	$32 ; "2"
-	.byte	$40 ; "@"
-	.byte	$33 ; "3"
-	.byte	$23 ; "#"
-	.byte	$34 ; "4"
-	.byte	$24 ; "$"
-	.byte	$35 ; "5"
-	.byte	$25 ; "%"
-	.byte	$36 ; "6"
-	.byte	$5e ; "^"
-	.byte	$37 ; "7"
-	.byte	$26 ; "&"
-	.byte	$38 ; "8"
-	.byte	$2a ; "*"
-	.byte	$39 ; "9"
-	.byte	$28 ; "("
-	.byte	$30 ; "0"
-	.byte	$29 ; ")"
-	.byte	$2d ; "-"
-	.byte	$5f ; "_"
-	.byte	$3d ; "="
-	.byte	$2b ; "+"
-	.byte	$3b ; ";"
-	.byte	$3a ; ":"
-	.byte	$27 ; "'"
-	.byte	$22 ; """
-	.byte	$2c ; ","
-	.byte	$3c ; "<"
-	.byte	$2e ; "."
-	.byte	$3e ; ">"
-	.byte	$2f ; "/"
-	.byte	$3f ; "?"
+	.byte	$60,$7e		; ` => ~
+	.byte	$31,$21		; 1 => !
+	.byte	$32,$40		; 2 => @
+	.byte	$33,$23		; 3 => #
+	.byte	$34,$24		; 4 => $
+	.byte	$35,$25		; 5 => %
+	.byte	$36,$5e		; 6 => ^
+	.byte	$37,$26		; 7 => &
+	.byte	$38,$2a		; 8 => *
+	.byte	$39,$28		; 9 => (
+	.byte	$30,$29		; 0 => )
+	.byte	$2d,$5f		; - => _
+	.byte	$3d,$2b		; = => +
+	.byte	$3b,$3a		; ; => :
+	.byte	$27,$22		; ' => "
+	.byte	$2c,$3c		; , => <
+	.byte	$2e,$3e		; . => >
+	.byte	$2f,$3f		; / => ?
 	.byte	$FF
 
