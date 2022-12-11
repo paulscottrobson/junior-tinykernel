@@ -376,6 +376,12 @@ HandleKeyboard:
 		phx
 		phy
 
+;		pha
+;		jsr 	PrintHex
+;		lda 	#'<'
+;		jsr 	PrintCharacter
+;		pla
+
 		pha 									; save new code
 		;
 		;		Set/clear bit in the KeyStatus area
@@ -655,8 +661,9 @@ _NotRAM:
 	lda 	#42
 	jsr 	$FFD2
 
-	jsr 	INITKEYBOARD
+	;bra 	EchoScanCodes8042
 
+	jsr 	INITKEYBOARD
 	cli
 
 	;
@@ -675,6 +682,27 @@ Prompt2:
 
 RunProgram:	
 	jmp 	($FFF8)
+
+; ********************************************************************************
+;
+;							Echo Scan codes 8042 version
+;
+; ********************************************************************************
+
+EchoScanCodes8042:
+	LDA STATUS_PORT 					; wait for buffer to have data
+	and 	#1
+	beq 	EchoScanCodes8042
+
+	LDA KBD_INPT_BUF                    ; Get Scan Code from KeyBoard
+	jsr 	PrintHex 					; and echo it out.
+	bra 	EchoScanCodes8042
+
+; ********************************************************************************
+;
+;									Echo code
+;
+; ********************************************************************************
 
 NextChar:	
 	jsr 	NewReadKeyboard

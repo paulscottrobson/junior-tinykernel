@@ -29,10 +29,10 @@ fnxmgr:
 run: monitor
 	bin$(S)jr256 monitor.rom@m 
 
-ram:
+ram: monitor
 	python bin$(S)fnxmgr.zip --port $(TTYPORT) --boot ram
 	python bin$(S)fnxmgr.zip --port $(TTYPORT) --binary monitor.rom --address $(LMONITOR)
 
-flash:
+flash:  monitor
 	python bin$(S)fnxmgr.zip --port $(TTYPORT) --boot flash
 	python bin$(S)fnxmgr.zip --port $(TTYPORT) --flash-bulk bulk.csv
