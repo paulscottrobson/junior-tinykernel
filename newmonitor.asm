@@ -688,7 +688,7 @@ _NotRAM:
 	;
 	;		Uncommenting this puts the keyboard into an echo loop.
 	;
-	jmp 	NextChar
+	;jmp 	NextChar
 
 	jsr 	RunProgram
 Halt:
