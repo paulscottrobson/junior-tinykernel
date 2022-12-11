@@ -65,7 +65,7 @@ for l in rawPS2data:
 		keycode = (keycode & 0x7F) | 0x80
 	positions[m.group(2).upper().strip()] = keycode
 
-keys = [ "LEFTCTRL","LEFTSHIFT","RIGHTSHIFT","C" ]
+keys = [ "LEFTCTRL","LEFTSHIFT","RIGHTSHIFT","C","Z","X","K","M","L" ]
 for k in keys:
 	code = positions[k]
 	print("KP_{0}_ROW = {1}".format(k,code >> 3))
