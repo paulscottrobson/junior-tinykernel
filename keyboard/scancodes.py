@@ -53,3 +53,20 @@ for l in rawPS2data:
 			print("\t.byte\t${0:02x},${1:02x}\t\t; {2} => {3}".format(a1,a2,chr(a1),chr(a2)))
 
 print("\t.byte\t$FF\n")	
+
+positions = {}
+rawPS2data = open("ps2.data").read(-1).strip().split("\n")
+rawPS2data = [x[1:].strip() if x.startswith("/") else x.strip() for x in rawPS2data]
+for l in rawPS2data:
+	m = re.match("^(.*?)\\:\\:(.*?)\\:",l)
+	assert m is not None 
+	keycode = int(m.group(1).replace(" ",""),16)
+	if keycode > 0x7F:
+		keycode = (keycode & 0x7F) | 0x80
+	positions[m.group(2).upper().strip()] = keycode
+
+keys = [ "LEFTCTRL","LEFTSHIFT","RIGHTSHIFT","C" ]
+for k in keys:
+	code = positions[k]
+	print("KP_{0}_ROW = {1}".format(k,code >> 3))
+	print("KP_{0}_COL = ${1:02x}".format(k,1 << (code & 7)))

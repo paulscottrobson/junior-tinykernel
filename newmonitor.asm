@@ -356,12 +356,12 @@ _ScrollLoop:
 ; ********************************************************************************
 
 ControlCCheck:
-	lda 	KeyStatus+3 				; check LCtrl pressed
-	and 	#$20
+	lda 	KeyStatus+KP_LEFTCTRL_COL	; check LCtrl pressed
+	and 	#KP_LEFTCTRL_ROW
 	beq 	Exit2
-	lda 	KeyStatus+5 				; check C pressed
-	and 	#$40 						; non-zero if so
-	eor 	#$40 				 		; Z set if so.
+	lda 	KeyStatus+KP_C_COL 			; check C pressed
+	and 	#KP_C_ROW 					; non-zero if so
+	eor 	#KP_C_ROW 			 		; Z set if so.
 	rts
 Exit2:
 	lda 	#$FF 						; NZ set
@@ -412,7 +412,7 @@ _HKGetBits:
 		rol 	a
 		dey
 		bpl 	_HKGetBits
-		lda 	ReleaseFlag 					; is the release flag set
+		ldy 	ReleaseFlag 					; is the release flag set
 		bne 	_HKRelease
 		ora 	KeyStatus,x  					; set bit
 		bra 	_HKWrite
@@ -450,11 +450,11 @@ ConvertInsertKey:
 
 		tay 								; save in Y
 		bmi 	_CIKEndShiftCheck 			; if bit 7 was set shift doesn't affect this.
-		lda 	KeyStatus+5 				; check left shift
-		and 	#4
+		lda 	KeyStatus+KP_LEFTSHIFT_ROW	; check left shift
+		and 	#KP_LEFTSHIFT_COL
 		bne 	_CIKShift
-		lda 	KeyStatus+6 				; check right shift
-		and 	#$40
+		lda 	KeyStatus+KP_RIGHTSHIFT_ROW	; check right shift
+		and 	#KP_RIGHTSHIFT_COL
 		beq 	_CIKEndShiftCheck
 _CIKShift:
 		ldx 	#254 						; check shift table.
@@ -476,8 +476,8 @@ _CIDefaultShift:							; don't shift control
 		eor 	#32
 		tay		
 _CIKEndShiftCheck: 							
-		lda 	KeyStatus+3 				; check LCtrl pressed
-		and 	#$20
+		lda 	KeyStatus+KP_LEFTCTRL_ROW	; check LCtrl pressed
+		and 	#KP_LEFTCTRL_COL
 		beq 	_CIKNotControl
 		tya 								; lower 5 bits only on control.
 		and 	#31
@@ -699,7 +699,7 @@ Prompt1:
 Prompt2:
 	.text 	13,"Running from Flash",13,0
 Prompt3:
-	.text 	13,"Requires new PS/2 Interface : B or 13th Dec FPGA or later",13,0
+	.text 	13,"Requires new PS/2 Interface : B or 13th Dec FPGA or later",13,13,0
 
 RunProgram:	
 	jmp 	($FFF8)
