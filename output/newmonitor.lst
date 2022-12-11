@@ -1,7 +1,7 @@
 
 ; 64tass Turbo Assembler Macro V1.57.2900 listing file
-; 64tass "-D MONITOR_ADDRESS=\$E000" "-D LOCKOUT_ADDRESS=\$F000" "-D BASIC_ADDRESS=\$38000" "-D SOURCE_ADDRESS=\$28000" "-D SPRITE_ADDRESS=\$30000" -q -c -b -o monitor.rom -L output/newmonitor.lst newmonitor.asm
-; Sun Dec 11 10:05:39 2022
+; 64tass "-D MONITOR_ADDRESS=\$E000" "-D LOCKOUT_ADDRESS=\$F000" "-D BASIC_ADDRESS=\$84000" "-D SOURCE_ADDRESS=\$28000" "-D SPRITE_ADDRESS=\$30000" -q -c -b -o monitor.rom -L output/newmonitor.lst newmonitor.asm
+; Sun Dec 11 10:40:14 2022
 
 ;Offset	;Hex		;Monitor	;Source
 
@@ -9,7 +9,7 @@
 
 =$e000					 MONITOR_ADDRESS=$E000
 =$f000					 LOCKOUT_ADDRESS=$F000
-=$38000					 BASIC_ADDRESS=$38000
+=$84000					 BASIC_ADDRESS=$84000
 =$28000					 SOURCE_ADDRESS=$28000
 =$30000					 SPRITE_ADDRESS=$30000
 
@@ -1024,160 +1024,162 @@
 .e92a	a2 ff		ldx #$ff		ldx		#$FF
 .e92c	9a		txs			txs
 .e92d	78		sei			sei
-.e92e	a9 b0		lda #$b0		lda 	#$80+$30+$00 						; LUT 3 , Edit 3, Active 0
-.e930	85 00		sta $00		 	sta 	$00
-.e932	a2 05		ldx #$05		ldx 	#5 									; map all to memory.
-.e934					_InitMMU3:
-.e934	8a		txa			txa
-.e935	95 08		sta $08,x		sta 	8,x
-.e937	ca		dex			dex
-.e938	10 fa		bpl $e934		bpl 	_InitMMU3
-.e93a	a9 07		lda #$07		lda 	#MONITOR_ADDRESS >> 13 				; map Monitor ROM in
-.e93c	85 0f		sta $0f			sta 	15
-.e93e	a9 1c		lda #$1c		lda 	#BASIC_ADDRESS >> 13 				; map BASIC ROM into slots 4 & 5, consecutive pages
-.e940	85 0c		sta $0c			sta 	12
-.e942	1a		inc a			inc 	a
-.e943	85 0d		sta $0d			sta 	13
-.e945	a9 06		lda #$06		lda 	#6 									; theoretically ; owned by Kernal.
-.e947	85 0e		sta $0e			sta 	14
-.e949	a9 b3		lda #$b3		lda 	#$80+$30+$03 						; LUT 3 , Edit 3, Active 3
-.e94b	85 00		sta $00			sta 	$00
-.e94d	a2 20		ldx #$20		ldx 	#EndWorkSpace-StartWorkSpace
-.e94f					_SRClear:
-.e94f	9e ff 01	stz $01ff,x		stz 	StartWorkSpace-1,x
-.e952	ca		dex			dex
-.e953	e0 ff		cpx #$ff		cpx 	#$FF
-.e955	d0 f8		bne $e94f		bne 	_SRClear
-.e957	20 dc e6	jsr $e6dc		jsr 	SelectPage0
-.e95a	a9 ff		lda #$ff	    LDA #$FF
-.e95c	8d 68 d6	sta $d668	    STA INT_EDGE_REG0
-.e95f	8d 69 d6	sta $d669	    STA INT_EDGE_REG1
-.e962	8d 6c d6	sta $d66c	    STA INT_MASK_REG0
-.e965	8d 6d d6	sta $d66d	    STA INT_MASK_REG1
-.e968	ad 60 d6	lda $d660	    lda INT_PENDING_REG0
-.e96b	8d 60 d6	sta $d660	    sta INT_PENDING_REG0
-.e96e	ad 61 d6	lda $d661	    lda INT_PENDING_REG1
-.e971	8d 61 d6	sta $d661	    sta INT_PENDING_REG1
-.e974	20 00 e0	jsr $e000		jsr 	TinyVickyInitialise
-.e977	20 49 e0	jsr $e049		jsr 	Init_Text_LUT
-.e97a	20 bf e1	jsr $e1bf		jsr 	LoadGraphicsLUT
-.e97d	20 01 e7	jsr $e701		jsr 	ClearScreen
-.e980	ee 04 02	inc $0204		inc 	yPosition
-.e983	ee 04 02	inc $0204		inc 	yPosition
-.e986	a2 08		ldx #$08		ldx 	#8
-.e988					_ShowMMU:
-.e988	b5 00		lda $00,x		lda 	0,x
-.e98a	20 83 e7	jsr $e783		jsr 	PrintHex
-.e98d	a9 20		lda #$20		lda 	#32
-.e98f	20 a6 e7	jsr $e7a6		jsr 	PrintCharacter
-.e992	e8		inx			inx
-.e993	e0 10		cpx #$10		cpx		#16
-.e995	d0 f1		bne $e988		bne 	_ShowMMU
-.e997	a9 0d		lda #$0d		lda 	#13
-.e999	20 a6 e7	jsr $e7a6		jsr 	PrintCharacter
-.e99c	a2 00		ldx #$00		ldx 	#0
-.e99e	a5 0f		lda $0f			lda 	15
-.e9a0	c9 3f		cmp #$3f		cmp 	#$3F
-.e9a2	d0 02		bne $e9a6		bne 	_NotRAM
-.e9a4	a2 11		ldx #$11		ldx 	#Prompt2-Prompt1
-.e9a6					_NotRAM:
-.e9a6	bd 19 ea	lda $ea19,x		lda 	Prompt1,x
-.e9a9	e8		inx			inx
-.e9aa	20 a6 e7	jsr $e7a6		jsr 	PrintCharacter
-.e9ad	c9 00		cmp #$00		cmp 	#0
-.e9af	d0 f5		bne $e9a6		bne 	_NotRAM
-.e9b1	a9 c8		lda #$c8	    lda #200
-.e9b3	8d 19 d0	sta $d019	    sta VKY_LINE_CMP_VALUE_LO
-.e9b6	a9 00		lda #$00	    lda #0
-.e9b8	8d 1a d0	sta $d01a	    sta VKY_LINE_CMP_VALUE_HI
-.e9bb	a9 01		lda #$01	    lda #$01
-.e9bd	8d 18 d0	sta $d018	    sta VKY_LINE_IRQ_CTRL_REG
-.e9c0	78		sei		    SEI
-.e9c1	ad 60 d6	lda $d660	    lda INT_PENDING_REG0  ; Read the Pending Register &
-.e9c4	29 02		and #$02	    and #JR0_INT01_SOL
-.e9c6	8d 60 d6	sta $d660	    sta INT_PENDING_REG0  ; Writing it back will clear the Active Bit
-.e9c9	ad 6c d6	lda $d66c	    lda INT_MASK_REG0
-.e9cc	29 fd		and #$fd	    and #~JR0_INT01_SOL
-.e9ce	8d 6c d6	sta $d66c	    sta INT_MASK_REG0
-.e9d1	ad 60 d6	lda $d660	    lda INT_PENDING_REG0  ; Read the Pending Register &
-.e9d4	29 04		and #$04	    and #JR0_INT02_KBD
-.e9d6	8d 60 d6	sta $d660	    sta INT_PENDING_REG0  ; Writing it back will clear the Active Bit
-.e9d9	ad 6c d6	lda $d66c	    lda INT_MASK_REG0
-.e9dc	29 fb		and #$fb	    and #~JR0_INT02_KBD
-.e9de	8d 6c d6	sta $d66c	    sta INT_MASK_REG0
-.e9e1	20 dc e6	jsr $e6dc		jsr 	SelectPage0
-.e9e4	a9 01		lda #$01		lda 	#1
-.e9e6	8d 00 d1	sta $d100		sta 	$D100
-.e9e9	9c 01 d1	stz $d101		stz 	$D101
-.e9ec	9c 02 d1	stz $d102		stz 	$D102
-.e9ef	9c 03 d1	stz $d103		stz 	$D103
-.e9f2	ee 00 07	inc $0700		inc 	$700
-.e9f5	ad 00 07	lda $0700		lda 	$700
-.e9f8	29 0f		and #$0f		and 	#15
-.e9fa	09 40		ora #$40		ora 	#64
-.e9fc	20 d2 ff	jsr $ffd2		jsr 	$FFD2
-.e9ff	20 d2 ff	jsr $ffd2		jsr 	$FFD2
-.ea02	20 d2 ff	jsr $ffd2		jsr 	$FFD2
-.ea05	20 55 ea	jsr $ea55		jsr 	init_text_palette
-.ea08	20 94 e6	jsr $e694		jsr 	init_graphics_palettes
-.ea0b	a9 2a		lda #$2a		lda 	#42
-.ea0d	20 d2 ff	jsr $ffd2		jsr 	$FFD2
-.ea10	20 f8 e0	jsr $e0f8		jsr 	INITKEYBOARD
-.ea13	58		cli			cli
-.ea14	20 3f ea	jsr $ea3f		jsr 	RunProgram
-.ea17					Halt:
-.ea17	80 fe		bra $ea17		bra 	Halt
-.ea19					Prompt1:
->ea19	0d 52 75 6e 6e 69 6e 67			.text 	13,"Running in RAM",13,0
->ea21	20 69 6e 20 52 41 4d 0d 00
-.ea2a					Prompt2:
->ea2a	0d 52 75 6e 6e 69 6e 67			.text 	13,"Running from Flash",13,0
->ea32	20 66 72 6f 6d 20 46 6c 61 73 68 0d 00
-.ea3f					RunProgram:
-.ea3f	6c f8 ff	jmp ($fff8)		jmp 	($FFF8)
-.ea42					NextChar:
-.ea42	20 fc e8	jsr $e8fc		jsr 	NewReadKeyboard
-.ea45	20 83 e7	jsr $e783		jsr 	PrintHex
-.ea48	20 a6 e7	jsr $e7a6		jsr 	PrintCharacter
-.ea4b	4c 42 ea	jmp $ea42		jmp 	NextChar
-.ea4e					ReadKeyboardStatusTable:
-.ea4e	da		phx			phx
-.ea4f	aa		tax			tax
-.ea50	bd 08 02	lda $0208,x		lda 	KeyStatus,x
-.ea53	fa		plx			plx
-.ea54	60		rts			rts
-.ea55					init_text_palette
-.ea55	64 01		stz $01					stz 	1
-.ea57	a2 00		ldx #$00	            ldx     #0
-.ea59	bd 68 ea	lda $ea68,x	_loop       lda     _palette,x
-.ea5c	9d 00 d8	sta $d800,x	            sta     TEXT_LUT_FG,x
-.ea5f	9d 40 d8	sta $d840,x	            sta     TEXT_LUT_BG,x
-.ea62	e8		inx		            inx
-.ea63	e0 40		cpx #$40	            cpx     #64
-.ea65	d0 f2		bne $ea59	            bne     _loop
-.ea67	60		rts		            rts
-.ea68					_palette
->ea68	00 00 00 00			            .dword  $000000
->ea6c	ff ff ff 00			            .dword  $ffffff
->ea70	00 00 88 00			            .dword  $880000
->ea74	ee ff aa 00			            .dword  $aaffee
->ea78	cc 44 cc 00			            .dword  $cc44cc
->ea7c	55 cc 00 00			            .dword  $00cc55
->ea80	aa 00 00 00			            .dword  $0000aa
->ea84	77 dd dd 00			            .dword  $dddd77
->ea88	55 88 dd 00			            .dword  $dd8855
->ea8c	00 44 66 00			            .dword  $664400
->ea90	77 77 ff 00			            .dword  $ff7777
->ea94	33 33 33 00			            .dword  $333333
->ea98	77 77 77 00			            .dword  $777777
->ea9c	66 ff aa 00			            .dword  $aaff66
->eaa0	ff 88 00 00			            .dword  $0088ff
->eaa4	bb bb bb 00			            .dword  $bbbbbb
+.e92e	a9 80		lda #$80		lda 	#$80 								; access current LUT
+.e930	85 00		sta $00			sta 	$00
+.e932	a4 0f		ldy $0f			ldy 	15 									; get monitor page
+.e934	a9 b0		lda #$b0		lda 	#$80+$30+$00 						; LUT 3 , Edit 3, Active 0
+.e936	85 00		sta $00		 	sta 	$00
+.e938	a2 05		ldx #$05		ldx 	#5 									; map all to memory.
+.e93a					_InitMMU3:
+.e93a	8a		txa			txa
+.e93b	95 08		sta $08,x		sta 	8,x
+.e93d	ca		dex			dex
+.e93e	10 fa		bpl $e93a		bpl 	_InitMMU3
+.e940	a9 42		lda #$42		lda 	#BASIC_ADDRESS >> 13 				; map BASIC ROM into slots 4 & 5, consecutive pages
+.e942	85 0c		sta $0c			sta 	12
+.e944	1a		inc a			inc 	a
+.e945	85 0d		sta $0d			sta 	13
+.e947	a9 06		lda #$06		lda 	#6 									; theoretically ; owned by Kernal.
+.e949	85 0e		sta $0e			sta 	14
+.e94b	84 0f		sty $0f			sty 	15 									; copy monitor page.
+.e94d	a9 b3		lda #$b3		lda 	#$80+$30+$03 						; LUT 3 , Edit 3, Active 3
+.e94f	85 00		sta $00			sta 	$00
+.e951	a2 20		ldx #$20		ldx 	#EndWorkSpace-StartWorkSpace
+.e953					_SRClear:
+.e953	9e ff 01	stz $01ff,x		stz 	StartWorkSpace-1,x
+.e956	ca		dex			dex
+.e957	e0 ff		cpx #$ff		cpx 	#$FF
+.e959	d0 f8		bne $e953		bne 	_SRClear
+.e95b	20 dc e6	jsr $e6dc		jsr 	SelectPage0
+.e95e	a9 ff		lda #$ff	    LDA #$FF
+.e960	8d 68 d6	sta $d668	    STA INT_EDGE_REG0
+.e963	8d 69 d6	sta $d669	    STA INT_EDGE_REG1
+.e966	8d 6c d6	sta $d66c	    STA INT_MASK_REG0
+.e969	8d 6d d6	sta $d66d	    STA INT_MASK_REG1
+.e96c	ad 60 d6	lda $d660	    lda INT_PENDING_REG0
+.e96f	8d 60 d6	sta $d660	    sta INT_PENDING_REG0
+.e972	ad 61 d6	lda $d661	    lda INT_PENDING_REG1
+.e975	8d 61 d6	sta $d661	    sta INT_PENDING_REG1
+.e978	20 00 e0	jsr $e000		jsr 	TinyVickyInitialise
+.e97b	20 49 e0	jsr $e049		jsr 	Init_Text_LUT
+.e97e	20 bf e1	jsr $e1bf		jsr 	LoadGraphicsLUT
+.e981	20 01 e7	jsr $e701		jsr 	ClearScreen
+.e984	ee 04 02	inc $0204		inc 	yPosition
+.e987	ee 04 02	inc $0204		inc 	yPosition
+.e98a	a2 08		ldx #$08		ldx 	#8
+.e98c					_ShowMMU:
+.e98c	b5 00		lda $00,x		lda 	0,x
+.e98e	20 83 e7	jsr $e783		jsr 	PrintHex
+.e991	a9 20		lda #$20		lda 	#32
+.e993	20 a6 e7	jsr $e7a6		jsr 	PrintCharacter
+.e996	e8		inx			inx
+.e997	e0 10		cpx #$10		cpx		#16
+.e999	d0 f1		bne $e98c		bne 	_ShowMMU
+.e99b	a9 0d		lda #$0d		lda 	#13
+.e99d	20 a6 e7	jsr $e7a6		jsr 	PrintCharacter
+.e9a0	a2 00		ldx #$00		ldx 	#0
+.e9a2	a5 0f		lda $0f			lda 	15
+.e9a4	c9 3f		cmp #$3f		cmp 	#$3F
+.e9a6	d0 02		bne $e9aa		bne 	_NotRAM
+.e9a8	a2 11		ldx #$11		ldx 	#Prompt2-Prompt1
+.e9aa					_NotRAM:
+.e9aa	bd 1d ea	lda $ea1d,x		lda 	Prompt1,x
+.e9ad	e8		inx			inx
+.e9ae	20 a6 e7	jsr $e7a6		jsr 	PrintCharacter
+.e9b1	c9 00		cmp #$00		cmp 	#0
+.e9b3	d0 f5		bne $e9aa		bne 	_NotRAM
+.e9b5	a9 c8		lda #$c8	    lda #200
+.e9b7	8d 19 d0	sta $d019	    sta VKY_LINE_CMP_VALUE_LO
+.e9ba	a9 00		lda #$00	    lda #0
+.e9bc	8d 1a d0	sta $d01a	    sta VKY_LINE_CMP_VALUE_HI
+.e9bf	a9 01		lda #$01	    lda #$01
+.e9c1	8d 18 d0	sta $d018	    sta VKY_LINE_IRQ_CTRL_REG
+.e9c4	78		sei		    SEI
+.e9c5	ad 60 d6	lda $d660	    lda INT_PENDING_REG0  ; Read the Pending Register &
+.e9c8	29 02		and #$02	    and #JR0_INT01_SOL
+.e9ca	8d 60 d6	sta $d660	    sta INT_PENDING_REG0  ; Writing it back will clear the Active Bit
+.e9cd	ad 6c d6	lda $d66c	    lda INT_MASK_REG0
+.e9d0	29 fd		and #$fd	    and #~JR0_INT01_SOL
+.e9d2	8d 6c d6	sta $d66c	    sta INT_MASK_REG0
+.e9d5	ad 60 d6	lda $d660	    lda INT_PENDING_REG0  ; Read the Pending Register &
+.e9d8	29 04		and #$04	    and #JR0_INT02_KBD
+.e9da	8d 60 d6	sta $d660	    sta INT_PENDING_REG0  ; Writing it back will clear the Active Bit
+.e9dd	ad 6c d6	lda $d66c	    lda INT_MASK_REG0
+.e9e0	29 fb		and #$fb	    and #~JR0_INT02_KBD
+.e9e2	8d 6c d6	sta $d66c	    sta INT_MASK_REG0
+.e9e5	20 dc e6	jsr $e6dc		jsr 	SelectPage0
+.e9e8	a9 01		lda #$01		lda 	#1
+.e9ea	8d 00 d1	sta $d100		sta 	$D100
+.e9ed	9c 01 d1	stz $d101		stz 	$D101
+.e9f0	9c 02 d1	stz $d102		stz 	$D102
+.e9f3	9c 03 d1	stz $d103		stz 	$D103
+.e9f6	ee 00 07	inc $0700		inc 	$700
+.e9f9	ad 00 07	lda $0700		lda 	$700
+.e9fc	29 0f		and #$0f		and 	#15
+.e9fe	09 40		ora #$40		ora 	#64
+.ea00	20 d2 ff	jsr $ffd2		jsr 	$FFD2
+.ea03	20 d2 ff	jsr $ffd2		jsr 	$FFD2
+.ea06	20 d2 ff	jsr $ffd2		jsr 	$FFD2
+.ea09	20 59 ea	jsr $ea59		jsr 	init_text_palette
+.ea0c	20 94 e6	jsr $e694		jsr 	init_graphics_palettes
+.ea0f	a9 2a		lda #$2a		lda 	#42
+.ea11	20 d2 ff	jsr $ffd2		jsr 	$FFD2
+.ea14	20 f8 e0	jsr $e0f8		jsr 	INITKEYBOARD
+.ea17	58		cli			cli
+.ea18	20 43 ea	jsr $ea43		jsr 	RunProgram
+.ea1b					Halt:
+.ea1b	80 fe		bra $ea1b		bra 	Halt
+.ea1d					Prompt1:
+>ea1d	0d 52 75 6e 6e 69 6e 67			.text 	13,"Running in RAM",13,0
+>ea25	20 69 6e 20 52 41 4d 0d 00
+.ea2e					Prompt2:
+>ea2e	0d 52 75 6e 6e 69 6e 67			.text 	13,"Running from Flash",13,0
+>ea36	20 66 72 6f 6d 20 46 6c 61 73 68 0d 00
+.ea43					RunProgram:
+.ea43	6c f8 ff	jmp ($fff8)		jmp 	($FFF8)
+.ea46					NextChar:
+.ea46	20 fc e8	jsr $e8fc		jsr 	NewReadKeyboard
+.ea49	20 83 e7	jsr $e783		jsr 	PrintHex
+.ea4c	20 a6 e7	jsr $e7a6		jsr 	PrintCharacter
+.ea4f	4c 46 ea	jmp $ea46		jmp 	NextChar
+.ea52					ReadKeyboardStatusTable:
+.ea52	da		phx			phx
+.ea53	aa		tax			tax
+.ea54	bd 08 02	lda $0208,x		lda 	KeyStatus,x
+.ea57	fa		plx			plx
+.ea58	60		rts			rts
+.ea59					init_text_palette
+.ea59	64 01		stz $01					stz 	1
+.ea5b	a2 00		ldx #$00	            ldx     #0
+.ea5d	bd 6c ea	lda $ea6c,x	_loop       lda     _palette,x
+.ea60	9d 00 d8	sta $d800,x	            sta     TEXT_LUT_FG,x
+.ea63	9d 40 d8	sta $d840,x	            sta     TEXT_LUT_BG,x
+.ea66	e8		inx		            inx
+.ea67	e0 40		cpx #$40	            cpx     #64
+.ea69	d0 f2		bne $ea5d	            bne     _loop
+.ea6b	60		rts		            rts
+.ea6c					_palette
+>ea6c	00 00 00 00			            .dword  $000000
+>ea70	ff ff ff 00			            .dword  $ffffff
+>ea74	00 00 88 00			            .dword  $880000
+>ea78	ee ff aa 00			            .dword  $aaffee
+>ea7c	cc 44 cc 00			            .dword  $cc44cc
+>ea80	55 cc 00 00			            .dword  $00cc55
+>ea84	aa 00 00 00			            .dword  $0000aa
+>ea88	77 dd dd 00			            .dword  $dddd77
+>ea8c	55 88 dd 00			            .dword  $dd8855
+>ea90	00 44 66 00			            .dword  $664400
+>ea94	77 77 ff 00			            .dword  $ff7777
+>ea98	33 33 33 00			            .dword  $333333
+>ea9c	77 77 77 00			            .dword  $777777
+>eaa0	66 ff aa 00			            .dword  $aaff66
+>eaa4	ff 88 00 00			            .dword  $0088ff
+>eaa8	bb bb bb 00			            .dword  $bbbbbb
 .ffcf	4c 02 e9	jmp $e902		jmp 	FakeKeyboardRead
 .ffd2	4c a6 e7	jmp $e7a6		jmp 	PrintCharacter
 .ffe1	4c 6c e8	jmp $e86c		jmp 	ControlCCheck
 .ffe4	4c 0d e9	jmp $e90d		jmp 	GetKeyIfPressed
-.ffe7	4c 4e ea	jmp $ea4e		jmp 	ReadKeyboardStatusTable
+.ffe7	4c 52 ea	jmp $ea52		jmp 	ReadKeyboardStatusTable
 .ffea	4c 01 e7	jmp $e701		jmp 	ClearScreen
 >fff8	00 80					.word 	$8000
 >fffa	22 e8					.word 	NMIHandler                       	; nmi ($FFFA)

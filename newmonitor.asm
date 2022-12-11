@@ -533,6 +533,10 @@ SystemReset:
 	txs
 	sei
 
+	lda 	#$80 								; access current LUT
+	sta 	$00
+	ldy 	15 									; get monitor page
+
 	lda 	#$80+$30+$00 						; LUT 3 , Edit 3, Active 0
  	sta 	$00
 
@@ -542,14 +546,14 @@ _InitMMU3:
 	sta 	8,x
 	dex
 	bpl 	_InitMMU3
-	lda 	#MONITOR_ADDRESS >> 13 				; map Monitor ROM in
-	sta 	15	
+
 	lda 	#BASIC_ADDRESS >> 13 				; map BASIC ROM into slots 4 & 5, consecutive pages
 	sta 	12
 	inc 	a
 	sta 	13
 	lda 	#6 									; theoretically ; owned by Kernal.
 	sta 	14
+	sty 	15 									; copy monitor page.
 	lda 	#$80+$30+$03 						; LUT 3 , Edit 3, Active 3
 	sta 	$00
 
