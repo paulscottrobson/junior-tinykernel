@@ -659,12 +659,10 @@ _NotRAM:
 
 	cli
 
-;	bra 	NextChar
-	
 	;
-	;		Uncomment this to break on start.
+	;		Uncommenting this puts the keyboard into an echo loop.
 	;
-;	.byte 	$DB
+	;bra 	NextChar
 
 	jsr 	RunProgram
 Halt:

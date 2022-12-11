@@ -1,7 +1,7 @@
 
 ; 64tass Turbo Assembler Macro V1.57.2900 listing file
 ; 64tass "-D MONITOR_ADDRESS=\$E000" "-D LOCKOUT_ADDRESS=\$F000" "-D BASIC_ADDRESS=\$84000" "-D SOURCE_ADDRESS=\$28000" "-D SPRITE_ADDRESS=\$30000" -q -c -b -o monitor.rom -L output/newmonitor.lst newmonitor.asm
-; Sun Dec 11 10:40:14 2022
+; Sun Dec 11 11:44:40 2022
 
 ;Offset	;Hex		;Monitor	;Source
 
@@ -1083,7 +1083,7 @@
 .e9a6	d0 02		bne $e9aa		bne 	_NotRAM
 .e9a8	a2 11		ldx #$11		ldx 	#Prompt2-Prompt1
 .e9aa					_NotRAM:
-.e9aa	bd 1d ea	lda $ea1d,x		lda 	Prompt1,x
+.e9aa	bd 1f ea	lda $ea1f,x		lda 	Prompt1,x
 .e9ad	e8		inx			inx
 .e9ae	20 a6 e7	jsr $e7a6		jsr 	PrintCharacter
 .e9b1	c9 00		cmp #$00		cmp 	#0
@@ -1120,66 +1120,67 @@
 .ea00	20 d2 ff	jsr $ffd2		jsr 	$FFD2
 .ea03	20 d2 ff	jsr $ffd2		jsr 	$FFD2
 .ea06	20 d2 ff	jsr $ffd2		jsr 	$FFD2
-.ea09	20 59 ea	jsr $ea59		jsr 	init_text_palette
+.ea09	20 5b ea	jsr $ea5b		jsr 	init_text_palette
 .ea0c	20 94 e6	jsr $e694		jsr 	init_graphics_palettes
 .ea0f	a9 2a		lda #$2a		lda 	#42
 .ea11	20 d2 ff	jsr $ffd2		jsr 	$FFD2
 .ea14	20 f8 e0	jsr $e0f8		jsr 	INITKEYBOARD
 .ea17	58		cli			cli
-.ea18	20 43 ea	jsr $ea43		jsr 	RunProgram
-.ea1b					Halt:
-.ea1b	80 fe		bra $ea1b		bra 	Halt
-.ea1d					Prompt1:
->ea1d	0d 52 75 6e 6e 69 6e 67			.text 	13,"Running in RAM",13,0
->ea25	20 69 6e 20 52 41 4d 0d 00
-.ea2e					Prompt2:
->ea2e	0d 52 75 6e 6e 69 6e 67			.text 	13,"Running from Flash",13,0
->ea36	20 66 72 6f 6d 20 46 6c 61 73 68 0d 00
-.ea43					RunProgram:
-.ea43	6c f8 ff	jmp ($fff8)		jmp 	($FFF8)
-.ea46					NextChar:
-.ea46	20 fc e8	jsr $e8fc		jsr 	NewReadKeyboard
-.ea49	20 83 e7	jsr $e783		jsr 	PrintHex
-.ea4c	20 a6 e7	jsr $e7a6		jsr 	PrintCharacter
-.ea4f	4c 46 ea	jmp $ea46		jmp 	NextChar
-.ea52					ReadKeyboardStatusTable:
-.ea52	da		phx			phx
-.ea53	aa		tax			tax
-.ea54	bd 08 02	lda $0208,x		lda 	KeyStatus,x
-.ea57	fa		plx			plx
-.ea58	60		rts			rts
-.ea59					init_text_palette
-.ea59	64 01		stz $01					stz 	1
-.ea5b	a2 00		ldx #$00	            ldx     #0
-.ea5d	bd 6c ea	lda $ea6c,x	_loop       lda     _palette,x
-.ea60	9d 00 d8	sta $d800,x	            sta     TEXT_LUT_FG,x
-.ea63	9d 40 d8	sta $d840,x	            sta     TEXT_LUT_BG,x
-.ea66	e8		inx		            inx
-.ea67	e0 40		cpx #$40	            cpx     #64
-.ea69	d0 f2		bne $ea5d	            bne     _loop
-.ea6b	60		rts		            rts
-.ea6c					_palette
->ea6c	00 00 00 00			            .dword  $000000
->ea70	ff ff ff 00			            .dword  $ffffff
->ea74	00 00 88 00			            .dword  $880000
->ea78	ee ff aa 00			            .dword  $aaffee
->ea7c	cc 44 cc 00			            .dword  $cc44cc
->ea80	55 cc 00 00			            .dword  $00cc55
->ea84	aa 00 00 00			            .dword  $0000aa
->ea88	77 dd dd 00			            .dword  $dddd77
->ea8c	55 88 dd 00			            .dword  $dd8855
->ea90	00 44 66 00			            .dword  $664400
->ea94	77 77 ff 00			            .dword  $ff7777
->ea98	33 33 33 00			            .dword  $333333
->ea9c	77 77 77 00			            .dword  $777777
->eaa0	66 ff aa 00			            .dword  $aaff66
->eaa4	ff 88 00 00			            .dword  $0088ff
->eaa8	bb bb bb 00			            .dword  $bbbbbb
+.ea18	80 2e		bra $ea48		bra 	NextChar
+.ea1a	20 45 ea	jsr $ea45		jsr 	RunProgram
+.ea1d					Halt:
+.ea1d	80 fe		bra $ea1d		bra 	Halt
+.ea1f					Prompt1:
+>ea1f	0d 52 75 6e 6e 69 6e 67			.text 	13,"Running in RAM",13,0
+>ea27	20 69 6e 20 52 41 4d 0d 00
+.ea30					Prompt2:
+>ea30	0d 52 75 6e 6e 69 6e 67			.text 	13,"Running from Flash",13,0
+>ea38	20 66 72 6f 6d 20 46 6c 61 73 68 0d 00
+.ea45					RunProgram:
+.ea45	6c f8 ff	jmp ($fff8)		jmp 	($FFF8)
+.ea48					NextChar:
+.ea48	20 fc e8	jsr $e8fc		jsr 	NewReadKeyboard
+.ea4b	20 83 e7	jsr $e783		jsr 	PrintHex
+.ea4e	20 a6 e7	jsr $e7a6		jsr 	PrintCharacter
+.ea51	4c 48 ea	jmp $ea48		jmp 	NextChar
+.ea54					ReadKeyboardStatusTable:
+.ea54	da		phx			phx
+.ea55	aa		tax			tax
+.ea56	bd 08 02	lda $0208,x		lda 	KeyStatus,x
+.ea59	fa		plx			plx
+.ea5a	60		rts			rts
+.ea5b					init_text_palette
+.ea5b	64 01		stz $01					stz 	1
+.ea5d	a2 00		ldx #$00	            ldx     #0
+.ea5f	bd 6e ea	lda $ea6e,x	_loop       lda     _palette,x
+.ea62	9d 00 d8	sta $d800,x	            sta     TEXT_LUT_FG,x
+.ea65	9d 40 d8	sta $d840,x	            sta     TEXT_LUT_BG,x
+.ea68	e8		inx		            inx
+.ea69	e0 40		cpx #$40	            cpx     #64
+.ea6b	d0 f2		bne $ea5f	            bne     _loop
+.ea6d	60		rts		            rts
+.ea6e					_palette
+>ea6e	00 00 00 00			            .dword  $000000
+>ea72	ff ff ff 00			            .dword  $ffffff
+>ea76	00 00 88 00			            .dword  $880000
+>ea7a	ee ff aa 00			            .dword  $aaffee
+>ea7e	cc 44 cc 00			            .dword  $cc44cc
+>ea82	55 cc 00 00			            .dword  $00cc55
+>ea86	aa 00 00 00			            .dword  $0000aa
+>ea8a	77 dd dd 00			            .dword  $dddd77
+>ea8e	55 88 dd 00			            .dword  $dd8855
+>ea92	00 44 66 00			            .dword  $664400
+>ea96	77 77 ff 00			            .dword  $ff7777
+>ea9a	33 33 33 00			            .dword  $333333
+>ea9e	77 77 77 00			            .dword  $777777
+>eaa2	66 ff aa 00			            .dword  $aaff66
+>eaa6	ff 88 00 00			            .dword  $0088ff
+>eaaa	bb bb bb 00			            .dword  $bbbbbb
 .ffcf	4c 02 e9	jmp $e902		jmp 	FakeKeyboardRead
 .ffd2	4c a6 e7	jmp $e7a6		jmp 	PrintCharacter
 .ffe1	4c 6c e8	jmp $e86c		jmp 	ControlCCheck
 .ffe4	4c 0d e9	jmp $e90d		jmp 	GetKeyIfPressed
-.ffe7	4c 52 ea	jmp $ea52		jmp 	ReadKeyboardStatusTable
+.ffe7	4c 54 ea	jmp $ea54		jmp 	ReadKeyboardStatusTable
 .ffea	4c 01 e7	jmp $e701		jmp 	ClearScreen
 >fff8	00 80					.word 	$8000
 >fffa	22 e8					.word 	NMIHandler                       	; nmi ($FFFA)
