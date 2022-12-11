@@ -618,11 +618,9 @@ _ShowMMU:
 	bne 	_NotRAM
 	ldx 	#Prompt2-Prompt1
 _NotRAM:
-	lda 	Prompt1,x
-	inx
-	jsr 	PrintCharacter		
-	cmp 	#0
-	bne 	_NotRAM
+	jsr 	PrintMsg
+	ldx 	#Prompt3-Prompt1
+	jsr 	PrintMsg
 
     lda #200
     sta VKY_LINE_CMP_VALUE_LO
@@ -670,10 +668,12 @@ _NotRAM:
 	lda 	#42
 	jsr 	$FFD2
 
-	;bra 	EchoScanCodesStefany
-
-	jsr 	INITKEYBOARD
+	jsr 	InitStefanyPS2
 	cli
+
+Halt2:
+	bra 	Halt2
+
 
 	;
 	;		Uncommenting this puts the keyboard into an echo loop.
@@ -688,9 +688,19 @@ Prompt1:
 	.text 	13,"Running in RAM",13,0
 Prompt2:
 	.text 	13,"Running from Flash",13,0
+Prompt3:
+	.text 	13,"Requires new PS/2 Interface : B or 13th Dec FPGA or later",13,0
 
 RunProgram:	
 	jmp 	($FFF8)
+
+PrintMsg:
+	lda 	Prompt1,x
+	inx
+	jsr 	PrintCharacter		
+	cmp 	#0
+	bne 	PrintMsg
+	rts
 
 ; ********************************************************************************
 ;
@@ -698,11 +708,14 @@ RunProgram:
 ;
 ; ********************************************************************************
 
-EchoScanCodesStefany:
+InitStefanyPS2:
 		stz 	$01
 		lda 	#$30 						; should reset the hardware
 		sta 	$D640
 		stz 	$D640
+		rts
+
+EchoScanCodesStefany:
 _ESCSLoop:
 		lda 	$D644 						; wait for FIFO not to be empty
 		and 	#1
@@ -710,21 +723,6 @@ _ESCSLoop:
 		lda 	$D642 						; read it in.
 		jsr 	PrintHex
 		bra 	_ESCSLoop
-
-; ********************************************************************************
-;
-;							Echo Scan codes 8042 version
-;
-; ********************************************************************************
-
-EchoScanCodes8042:
-	LDA STATUS_PORT 					; wait for buffer to have data
-	and 	#1
-	beq 	EchoScanCodes8042
-
-	LDA KBD_INPT_BUF                    ; Get Scan Code from KeyBoard
-	jsr 	PrintHex 					; and echo it out.
-	bra 	EchoScanCodes8042
 
 ; ********************************************************************************
 ;
@@ -750,7 +748,6 @@ ReadKeyboardStatusTable:
 	lda 	KeyStatus,x
 	plx
 	rts
-
 
 init_text_palette
 			stz 	1
