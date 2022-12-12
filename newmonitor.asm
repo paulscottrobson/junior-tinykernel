@@ -688,7 +688,7 @@ _NotRAM:
 	;
 	;		Uncommenting this puts the keyboard into an echo loop.
 	;
-	jmp 	EchoLoop
+;	jmp 	EchoLoop
 
 	jsr 	RunProgram
 Halt:
