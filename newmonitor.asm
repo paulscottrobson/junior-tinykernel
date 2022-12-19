@@ -688,7 +688,7 @@ _NotRAM:
 	;
 	;		Uncommenting this puts the keyboard into an echo loop.
 	;
-;	jmp 	EchoLoop
+	;jmp 	EchoLoop
 
 	jsr 	RunProgram
 Halt:
@@ -741,7 +741,9 @@ _ESCSLoop:
 ; ********************************************************************************
 
 EchoLoop:	
-	jsr 	NewReadKeyboard
+	jsr 	GetKeyIfPressed
+	cmp 	#0
+	beq 	EchoLoop	
 	jsr 	PrintHex
 	jsr 	PrintCharacter
 	jmp 	EchoLoop

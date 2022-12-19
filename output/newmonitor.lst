@@ -1,7 +1,7 @@
 
 ; 64tass Turbo Assembler Macro V1.57.2900 listing file
 ; 64tass "-D MONITOR_ADDRESS=\$E000" "-D LOCKOUT_ADDRESS=\$F000" "-D BASIC_ADDRESS=\$38000" "-D SOURCE_ADDRESS=\$28000" "-D SPRITE_ADDRESS=\$30000" -q -c -b -o monitor.rom -L output/newmonitor.lst newmonitor.asm
-; Thu Dec 15 16:31:51 2022
+; Mon Dec 19 20:30:31 2022
 
 ;Offset	;Hex		;Monitor	;Source
 
@@ -1164,7 +1164,7 @@
 .e9fc	20 d2 ff	jsr $ffd2		jsr 	$FFD2
 .e9ff	20 d2 ff	jsr $ffd2		jsr 	$FFD2
 .ea02	20 d2 ff	jsr $ffd2		jsr 	$FFD2
-.ea05	20 b8 ea	jsr $eab8		jsr 	init_text_palette
+.ea05	20 bc ea	jsr $eabc		jsr 	init_text_palette
 .ea08	20 5a e6	jsr $e65a		jsr 	init_graphics_palettes
 .ea0b	a9 2a		lda #$2a		lda 	#42
 .ea0d	20 d2 ff	jsr $ffd2		jsr 	$FFD2
@@ -1209,48 +1209,50 @@
 .eaa0	20 49 e7	jsr $e749			jsr 	PrintHex
 .eaa3	80 f1		bra $ea96			bra 	_ESCSLoop
 .eaa5					EchoLoop:
-.eaa5	20 ec e8	jsr $e8ec		jsr 	NewReadKeyboard
-.eaa8	20 49 e7	jsr $e749		jsr 	PrintHex
-.eaab	20 6c e7	jsr $e76c		jsr 	PrintCharacter
-.eaae	4c a5 ea	jmp $eaa5		jmp 	EchoLoop
-.eab1					ReadKeyboardStatusTable:
-.eab1	da		phx			phx
-.eab2	aa		tax			tax
-.eab3	bd 10 02	lda $0210,x		lda 	KeyStatus,x
-.eab6	fa		plx			plx
-.eab7	60		rts			rts
-.eab8					init_text_palette
-.eab8	64 01		stz $01					stz 	1
-.eaba	a2 00		ldx #$00	            ldx     #0
-.eabc	bd cb ea	lda $eacb,x	_loop       lda     _palette,x
-.eabf	9d 00 d8	sta $d800,x	            sta     TEXT_LUT_FG,x
-.eac2	9d 40 d8	sta $d840,x	            sta     TEXT_LUT_BG,x
-.eac5	e8		inx		            inx
-.eac6	e0 40		cpx #$40	            cpx     #64
-.eac8	d0 f2		bne $eabc	            bne     _loop
-.eaca	60		rts		            rts
-.eacb					_palette
->eacb	00 00 00 00			            .dword  $000000
->eacf	ff ff ff 00			            .dword  $ffffff
->ead3	00 00 88 00			            .dword  $880000
->ead7	ee ff aa 00			            .dword  $aaffee
->eadb	cc 44 cc 00			            .dword  $cc44cc
->eadf	55 cc 00 00			            .dword  $00cc55
->eae3	aa 00 00 00			            .dword  $0000aa
->eae7	77 dd dd 00			            .dword  $dddd77
->eaeb	55 88 dd 00			            .dword  $dd8855
->eaef	00 44 66 00			            .dword  $664400
->eaf3	77 77 ff 00			            .dword  $ff7777
->eaf7	33 33 33 00			            .dword  $333333
->eafb	77 77 77 00			            .dword  $777777
->eaff	66 ff aa 00			            .dword  $aaff66
->eb03	ff 88 00 00			            .dword  $0088ff
->eb07	bb bb bb 00			            .dword  $bbbbbb
+.eaa5	20 fd e8	jsr $e8fd		jsr 	GetKeyIfPressed
+.eaa8	c9 00		cmp #$00		cmp 	#0
+.eaaa	f0 f9		beq $eaa5		beq 	EchoLoop
+.eaac	20 49 e7	jsr $e749		jsr 	PrintHex
+.eaaf	20 6c e7	jsr $e76c		jsr 	PrintCharacter
+.eab2	4c a5 ea	jmp $eaa5		jmp 	EchoLoop
+.eab5					ReadKeyboardStatusTable:
+.eab5	da		phx			phx
+.eab6	aa		tax			tax
+.eab7	bd 10 02	lda $0210,x		lda 	KeyStatus,x
+.eaba	fa		plx			plx
+.eabb	60		rts			rts
+.eabc					init_text_palette
+.eabc	64 01		stz $01					stz 	1
+.eabe	a2 00		ldx #$00	            ldx     #0
+.eac0	bd cf ea	lda $eacf,x	_loop       lda     _palette,x
+.eac3	9d 00 d8	sta $d800,x	            sta     TEXT_LUT_FG,x
+.eac6	9d 40 d8	sta $d840,x	            sta     TEXT_LUT_BG,x
+.eac9	e8		inx		            inx
+.eaca	e0 40		cpx #$40	            cpx     #64
+.eacc	d0 f2		bne $eac0	            bne     _loop
+.eace	60		rts		            rts
+.eacf					_palette
+>eacf	00 00 00 00			            .dword  $000000
+>ead3	ff ff ff 00			            .dword  $ffffff
+>ead7	00 00 88 00			            .dword  $880000
+>eadb	ee ff aa 00			            .dword  $aaffee
+>eadf	cc 44 cc 00			            .dword  $cc44cc
+>eae3	55 cc 00 00			            .dword  $00cc55
+>eae7	aa 00 00 00			            .dword  $0000aa
+>eaeb	77 dd dd 00			            .dword  $dddd77
+>eaef	55 88 dd 00			            .dword  $dd8855
+>eaf3	00 44 66 00			            .dword  $664400
+>eaf7	77 77 ff 00			            .dword  $ff7777
+>eafb	33 33 33 00			            .dword  $333333
+>eaff	77 77 77 00			            .dword  $777777
+>eb03	66 ff aa 00			            .dword  $aaff66
+>eb07	ff 88 00 00			            .dword  $0088ff
+>eb0b	bb bb bb 00			            .dword  $bbbbbb
 .ffcf	4c f2 e8	jmp $e8f2		jmp 	FakeKeyboardRead
 .ffd2	4c 6c e7	jmp $e76c		jmp 	PrintCharacter
 .ffe1	4c 32 e8	jmp $e832		jmp 	ControlCCheck
 .ffe4	4c fd e8	jmp $e8fd		jmp 	GetKeyIfPressed
-.ffe7	4c b1 ea	jmp $eab1		jmp 	ReadKeyboardStatusTable
+.ffe7	4c b5 ea	jmp $eab5		jmp 	ReadKeyboardStatusTable
 .ffea	4c c7 e6	jmp $e6c7		jmp 	ClearScreen
 >fff8	00 80					.word 	$8000
 >fffa	e8 e7					.word 	NMIHandler                       	; nmi ($FFFA)
