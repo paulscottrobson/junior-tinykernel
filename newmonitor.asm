@@ -796,7 +796,9 @@ _palette
 ; ********************************************************************************
 	
 	* = $FFCF 									; CHRIN
-	jmp 	FakeKeyboardRead	
+Disable1:
+	.byte 	$DB
+	bra 	Disable1
 	* = $FFD2 									; CHROUT
 	jmp 	PrintCharacter
 	* = $FFE1
@@ -804,9 +806,13 @@ _palette
 	* = $FFE4
 	jmp 	GetKeyIfPressed
 	* = $FFE7
-	jmp 	ReadKeyboardStatusTable
-	* = $FFEA
-	jmp 	ClearScreen
+Disable2: 										; Read Keyboard Status table
+	.byte 	$DB
+	bra 	Disable2
+	* = $FFEA 									; Clear Screen
+Disable3:
+	.byte 	$DB
+	bra 	Disable3	
 	
 ; ********************************************************************************
 ;
