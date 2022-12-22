@@ -1,7 +1,7 @@
 
 ; 64tass Turbo Assembler Macro V1.57.2900 listing file
 ; 64tass "-D MONITOR_ADDRESS=\$E000" "-D LOCKOUT_ADDRESS=\$F000" "-D BASIC_ADDRESS=\$38000" "-D SOURCE_ADDRESS=\$28000" "-D SPRITE_ADDRESS=\$30000" -q -c -b -o monitor.rom -L output/newmonitor.lst newmonitor.asm
-; Tue Dec 20 10:44:32 2022
+; Thu Dec 22 14:23:31 2022
 
 ;Offset	;Hex		;Monitor	;Source
 
@@ -16,6 +16,7 @@
 ;******  Processing input file: newmonitor.asm
 
 =$fc					zTemp0 = $FC 								; 2 byte memory units.
+=$f0					eventBuffer = $F0 							; location of event buffer.
 =6					ClockMhz = 6 								; clock speed in MHz (affects repeat timing)
 =1					KeyboardInvert = 1 							; 0 if keyboard active high, 1 if active low.
 =8					KQSize = 8 									; size of keyboard queue
@@ -1248,6 +1249,21 @@
 >eb03	66 ff aa 00			            .dword  $aaff66
 >eb07	ff 88 00 00			            .dword  $0088ff
 >eb0b	bb bb bb 00			            .dword  $bbbbbb
+.eb0f					GetNextEvent:
+.eb0f	20 fd e8	jsr $e8fd			jsr 	GetKeyIfPressed 				; is a key pressed
+.eb12	c9 00		cmp #$00			cmp 	#0
+.eb14	38		sec				sec
+.eb15	f0 0b		beq $eb22			beq 	_GNEExit 						; if not, return with carry set.
+.eb17	5a		phy				phy
+.eb18	a0 05		ldy #$05			ldy 	#5 								; write to event.key.ascii
+.eb1a	91 f0		sta ($f0),y			sta 	(eventBuffer),y
+.eb1c	7a		ply				ply
+.eb1d	a9 08		lda #$08			lda 	#8 								; event type - this is key pressed.
+.eb1f	92 f0		sta ($f0)			sta 	(eventBuffer)
+.eb21	18		clc				clc 									; event occurred.
+.eb22					_GNEExit:
+.eb22	60		rts				rts
+.ff00	4c 0f eb	jmp $eb0f		jmp 	GetNextEvent
 .ffcf					Disable1:
 >ffcf	db					.byte 	$DB
 .ffd0	80 fd		bra $ffcf		bra 	Disable1

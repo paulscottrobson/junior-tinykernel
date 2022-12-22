@@ -10,6 +10,7 @@
 ; *******************************************************************************************
 
 zTemp0 = $FC 								; 2 byte memory units.
+eventBuffer = $F0 							; location of event buffer.
 
 ClockMhz = 6 								; clock speed in MHz (affects repeat timing)
 KeyboardInvert = 1 							; 0 if keyboard active high, 1 if active low.
@@ -791,10 +792,34 @@ _palette
 
 ; ********************************************************************************
 ;
+;						Get next event (keyboard, ASCII only)
+;
+; ********************************************************************************
+
+GetNextEvent:
+		jsr 	GetKeyIfPressed 				; is a key pressed
+		cmp 	#0
+		sec 	
+		beq 	_GNEExit 						; if not, return with carry set.
+		phy
+		ldy 	#5 								; write to event.key.ascii
+		sta 	(eventBuffer),y
+		ply
+		lda 	#8 								; event type - this is key pressed.
+		sta 	(eventBuffer)
+		clc 									; event occurred.
+_GNEExit:
+		rts		
+
+; ********************************************************************************
+;
 ;							 Commodore Compatible Vectors
 ;
 ; ********************************************************************************
-	
+
+	* = $FF00 									; get next event
+	jmp 	GetNextEvent
+
 	* = $FFCF 									; CHRIN
 Disable1:
 	.byte 	$DB
