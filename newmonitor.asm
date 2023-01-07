@@ -822,8 +822,7 @@ _GNEExit:
 
 	* = $FFCF 									; CHRIN
 Disable1:
-	.byte 	$DB
-	bra 	Disable1
+	jmp 	NewReadKeyboard
 	* = $FFD2 									; CHROUT
 	jmp 	PrintCharacter
 	* = $FFE1
@@ -831,13 +830,9 @@ Disable1:
 	* = $FFE4
 	jmp 	GetKeyIfPressed
 	* = $FFE7
-Disable2: 										; Read Keyboard Status table
-	.byte 	$DB
-	bra 	Disable2
+	jmp 	ReadKeyboardStatusTable
 	* = $FFEA 									; Clear Screen
-Disable3:
-	.byte 	$DB
-	bra 	Disable3	
+	jmp	 	ClearScreen
 	
 ; ********************************************************************************
 ;

@@ -1,7 +1,7 @@
 
 ; 64tass Turbo Assembler Macro V1.57.2900 listing file
 ; 64tass "-D MONITOR_ADDRESS=\$E000" "-D LOCKOUT_ADDRESS=\$F000" "-D BASIC_ADDRESS=\$38000" "-D SOURCE_ADDRESS=\$28000" "-D SPRITE_ADDRESS=\$30000" -q -c -b -o monitor.rom -L output/newmonitor.lst newmonitor.asm
-; Fri Jan  6 16:00:25 2023
+; Sat Jan  7 12:34:21 2023
 
 ;Offset	;Hex		;Monitor	;Source
 
@@ -1265,17 +1265,12 @@
 .eb22	60		rts				rts
 .ff00	4c 0f eb	jmp $eb0f		jmp 	GetNextEvent
 .ffcf					Disable1:
->ffcf	db					.byte 	$DB
-.ffd0	80 fd		bra $ffcf		bra 	Disable1
+.ffcf	4c ec e8	jmp $e8ec		jmp 	NewReadKeyboard
 .ffd2	4c 6c e7	jmp $e76c		jmp 	PrintCharacter
 .ffe1	4c 32 e8	jmp $e832		jmp 	ControlCCheck
 .ffe4	4c fd e8	jmp $e8fd		jmp 	GetKeyIfPressed
-.ffe7					Disable2:
->ffe7	db					.byte 	$DB
-.ffe8	80 fd		bra $ffe7		bra 	Disable2
-.ffea					Disable3:
->ffea	db					.byte 	$DB
-.ffeb	80 fd		bra $ffea		bra 	Disable3
+.ffe7	4c b5 ea	jmp $eab5		jmp 	ReadKeyboardStatusTable
+.ffea	4c c7 e6	jmp $e6c7		jmp	 	ClearScreen
 >fff8	00 80					.word 	$8000
 >fffa	e8 e7					.word 	NMIHandler                       	; nmi ($FFFA)
 >fffc	1a e9					.word 	SystemReset                         ; reset ($FFFC)
